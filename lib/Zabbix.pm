@@ -51,7 +51,8 @@ sub authenticate {
     my %args = validate(@_, { user => 1,
                               password => 1 });
 
-    my $response = $self->query(method => 'user.authenticate', params => \%args);
+    my $response = $self->query(method => 'user.authenticate',
+                                params => \%args);
 
     $self->{cookie} = '';
     $self->{cookie} = decode_json($response->decoded_content)->{result}
@@ -100,7 +101,11 @@ sub query {
 
 sub get {
 
-    my ($self, %args) = @_;
+    my $self = shift;
+
+    my %args = validate(@_, { method => { TYPE => SCALAR },
+                              params => { TYPE => HASHREF,
+                                          optional => 1 }});
 
     my $response = $self->query(%args);
 
@@ -119,14 +124,12 @@ sub get_item_from_host {
     my $self = shift;
 
     my %args = validate(@_, { host => { TYPE => SCALAR },
-                              key => { TYPE => SCALAR },
-                              fields => { TYPE => ARRAYREF } });
+                              key => { TYPE => SCALAR } });
 
     return $self->get(method => 'item.get',
                       params => {
-                          host => $args{'host'},
-                          search => { key_ => $args{'key'} },
-                          filter => $args{'fields'},
+                          filter => { host => $args{'host'},
+                                      key_ => $args{'key'} },
                           output => 'extend',
                       });
 
@@ -200,7 +203,7 @@ instance will also print HTTP request progress.
 
 Wrapper around C<query> that will return the result data instead.
 
-=item get_item_from_host(host => ZABBIX_HOST, key => STR, fields => ARRAYREF)
+=item get_item_from_host(host => ZABBIX_HOST, key => STR)
 
 Wrapper around C<get>.  This method is shorthand for:
 
@@ -210,7 +213,7 @@ Wrapper around C<get>.  This method is shorthand for:
                           search => { key_ => KEY },
                           filter => FIELDS,
                           output => 'extend',
-                      });
+                    });
 
 =back
 
