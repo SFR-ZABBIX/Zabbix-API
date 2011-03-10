@@ -1,19 +1,8 @@
-use Test::More tests => 1;
+use Test::More tests => 2;
 
-# TODO: rendre les guillemets optionnels, support de plusieurs function_args
-my $regexp = qr/(?<function_call>[\w]+\(
-                  (?<function_args>"
-                    (?<host>[\w .]+)
-                    :
-                    (?<item>[\w.]+)
-                    \[
-                      (?<item_arg>(\w+)(,(\w+))*)
-                      (,
-                        (?<item_arg>(\w+)(,(\w+))*)
-                      )*
-                    \]
-                  ")
-                \))/x;
+use_ok('Zabbix::Utils', qw/$RE_FORMULA/);
+
+my $regexp = $RE_FORMULA;
 
 my $string = q{last("Zabbix Server:net.if.in[eth0,bytes]")+last("Zibbax Server:do.stuff[bytes,lo0]")-blah("Nono le Robot:reticulate.splines[eth2,clous]")};
 
@@ -42,4 +31,5 @@ is_deeply(\@matches,
               function_args => '"Nono le Robot:reticulate.splines[eth2,clous]"',
               host => 'Nono le Robot',
               item => 'reticulate.splines',
-              item_arg => 'eth2,clous' }, ]);
+              item_arg => 'eth2,clous' }, ],
+          '... and a basic, correct formula is parsed');
