@@ -15,7 +15,7 @@ my $regexp = qr/(?<function_call>[\w]+\(
                   ")
                 \))/x;
 
-my $string = 'last("Zabbix Server:net.if.in[eth0,bytes]")+last("Zibbax Server:do.stuff[bytes,lo0]")';
+my $string = q{last("Zabbix Server:net.if.in[eth0,bytes]")+last("Zibbax Server:do.stuff[bytes,lo0]")-blah("Nono le Robot:reticulate.splines[eth2,clous]")};
 
 my @matches;
 
@@ -37,4 +37,9 @@ is_deeply(\@matches,
               function_args => '"Zibbax Server:do.stuff[bytes,lo0]"',
               host => 'Zibbax Server',
               item => 'do.stuff',
-              item_arg => 'bytes,lo0' } ]);
+              item_arg => 'bytes,lo0' },
+            { function_call => 'blah("Nono le Robot:reticulate.splines[eth2,clous]")',
+              function_args => '"Nono le Robot:reticulate.splines[eth2,clous]"',
+              host => 'Nono le Robot',
+              item => 'reticulate.splines',
+              item_arg => 'eth2,clous' }, ]);
