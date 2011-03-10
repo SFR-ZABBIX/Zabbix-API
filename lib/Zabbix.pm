@@ -119,19 +119,82 @@ sub get {
 
 }
 
-sub get_item_from_host {
+sub get_items {
 
     my $self = shift;
 
-    my %args = validate(@_, { host => { TYPE => SCALAR },
+    my %args = validate(@_, { host => { TYPE => SCALAR,
+                                        optional => 1 },
+                              hostids => { TYPE => ARRAYREF,
+                                           optional => 1 },
                               key => { TYPE => SCALAR } });
 
-    return $self->get(method => 'item.get',
-                      params => {
-                          filter => { host => $args{'host'},
-                                      key_ => $args{'key'} },
-                          output => 'extend',
-                      });
+    my @allowed_keys = qw/data_type formula key_ description params lastvalue status error hostid itemid units/;
+
+    my $items;
+
+    if (exists $args{'host'} and !exists $args{'hostids'}) {
+
+        $items = $self->get(method => 'item.get',
+                            params => {
+                                filter => { host => $args{'host'},
+                                            key_ => $args{'key'} },
+                                output => 'extend',
+                            });
+
+    } elsif (exists $args{'hostids'} and !exists $args{'host'}) {
+
+        $items = $self->get(method => 'item.get',
+                            params => {
+                                filter => { hostids => $args{'hostids'},
+                                            key_ => $args{'key'} },
+                                output => 'extend',
+                            });
+
+    } else {
+
+        croak q{Exactly one of 'host' or 'hostids' must be specified as a parameter to get_items};
+
+    }
+
+    foreach my $item (@{$items}) {
+
+        foreach my $key (keys %{$item}) {
+
+            delete $item->{$key} unless $key ~~ @allowed_keys;
+
+        }
+
+    }
+
+    return $items;
+
+}
+
+sub get_hosts {
+
+    my $self = shift;
+
+    my %args = validate(@_, { hostnames => { TYPE => ARRAYREF } });
+
+    my @allowed_keys = qw/port ip status hostid error macros host/;
+
+    my $hosts = $self->get(method => 'host.get',
+                           params => { filter => { host => $args{'hostnames'} },
+                                       output => 'extend',
+                                       select_macros => 'extend' });
+
+    foreach my $host (@{$hosts}) {
+
+        foreach my $key (keys %{$host}) {
+
+            delete $host->{$key} unless $key ~~ @allowed_keys;
+
+        }
+
+    }
+
+    return $hosts;
 
 }
 
