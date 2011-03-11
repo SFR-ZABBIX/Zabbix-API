@@ -266,17 +266,30 @@ instance will also print HTTP request progress.
 
 Wrapper around C<query> that will return the result data instead.
 
-=item get_item_from_host(host => ZABBIX_HOST, key => STR)
+=back
 
-Wrapper around C<get>.  This method is shorthand for:
+The following methods are wrappers around C<get> that mostly curry out the
+C<params> argument.
 
-  return $self->get(method => 'item.get',
-                    params => {
-                        host => HOST,
-                          search => { key_ => KEY },
-                          filter => FIELDS,
-                          output => 'extend',
-                    });
+=over 4
+
+=item get_items(key => STR, [host => ZABBIX_HOST], [hostids => ARRAYREF])
+
+Return an arrayref of hashrefs of data from Zabbix items.
+
+The host-name-style (with C<host>) fetches data for a single host (the API
+doesn't support filtering by more than one host by name; maybe we will later,
+through a cache of hostid => hostname, or by calling C<get_hosts> behind the
+scenes, which would be very slow.)
+
+The hostids-style (with C<hostids>) fetches data for multiple hosts (the API
+B<does> support filtering by more than one host by IDs).
+
+Exactly one of C<host> and C<hostids> must be specified.
+
+=item get_hosts(hostnames => ARRAYREF)
+
+Return an arrayref of hashrefs of data from Zabbix hosts.
 
 =back
 
