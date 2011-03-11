@@ -3,7 +3,7 @@ package Zabbix::Item;
 use strict;
 use warnings;
 use 5.010;
-use Carp;
+use Carp qw/confess/;
 
 sub new {
 
@@ -15,7 +15,7 @@ sub new {
 
     my @missing = $self->_validate;
 
-    @missing and croak "$class->new is missing parameters: @missing\n";
+    @missing and confess "$class->new is missing parameters: @missing\n";
 
     return $self;
 
@@ -25,7 +25,7 @@ sub _validate {
 
     my $self = shift;
 
-    my @required = qw/data_type formula key_ description params lastvalue status error hostid itemid units/;
+    my @required = qw/_root data_type formula key_ description params lastvalue status error hostid itemid units/;
 
     my @missing;
 
@@ -44,6 +44,15 @@ sub _validate {
     return @missing;
 
 }
+
+sub get_host {
+
+    my $self = shift;
+
+    return $self->{_root}->get_hosts(hostids => [ $self->{hostid} ])->[0];
+
+}
+
 1;
 __END__
 =pod

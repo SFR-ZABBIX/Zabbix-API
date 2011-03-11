@@ -25,7 +25,7 @@ sub _validate {
 
     my $self = shift;
 
-    my @required = qw/port ip status hostid error macros host/;
+    my @required = qw/_root port ip status hostid error macros host/;
 
     my @missing;
 

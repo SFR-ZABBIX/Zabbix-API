@@ -7,6 +7,7 @@ use 5.010;
 use Params::Validate qw/:all/;
 use Carp;
 use Data::Dumper;
+use Scalar::Util qw/weaken/;
 
 use JSON;
 use LWP::UserAgent;
@@ -154,7 +155,10 @@ sub get_items {
 
     }
 
-    return [ map { Zabbix::Item->new(%{$_}) } @{$items} ];
+    my $weak_ref_to_self = $self;
+    weaken $weak_ref_to_self;
+
+    return [ map { Zabbix::Item->new(_root => $weak_ref_to_self, %{$_}) } @{$items} ];
 
 }
 
@@ -162,14 +166,37 @@ sub get_hosts {
 
     my $self = shift;
 
-    my %args = validate(@_, { hostnames => { TYPE => ARRAYREF } });
+    my %args = validate(@_, { hostnames => { TYPE => ARRAYREF,
+                                             optional => 1 },
+                              hostids => { TYPE => ARRAYREF,
+                                           optional => 1 } });
 
-    my $hosts = $self->get(method => 'host.get',
-                           params => { filter => { host => $args{'hostnames'} },
-                                       output => 'extend',
-                                       select_macros => 'extend' });
+    my $hosts;
 
-    return [ map { Zabbix::Host->new(%{$_}) } @{$hosts} ];
+    if (exists $args{'hostnames'} and !exists $args{'hostids'}) {
+
+        $hosts = $self->get(method => 'host.get',
+                            params => { filter => { host => $args{'hostnames'} },
+                                        output => 'extend',
+                                        select_macros => 'extend' });
+
+    } elsif (exists $args{'hostids'} and !exists $args{'hostnames'}) {
+
+        $hosts = $self->get(method => 'host.get',
+                            params => { hostids => $args{'hostids'},
+                                        output => 'extend',
+                                        select_macros => 'extend' });
+
+    } else {
+
+        croak q{Exactly one of 'hostnames' or 'hostids' must be specified as a parameter to get_items};
+
+    }
+    
+    my $weak_ref_to_self = $self;
+    weaken $weak_ref_to_self;
+
+    return [ map { Zabbix::Host->new(_root => $weak_ref_to_self, %{$_}) } @{$hosts} ];
 
 }
 
