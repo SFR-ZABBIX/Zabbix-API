@@ -12,42 +12,7 @@ $zabber->has_cookie or BAIL_OUT('Could not authenticate, something is wrong!');
 
 my $hosts = $zabber->get_hosts(hostnames => ['Zabbix Server', 'Zibbax Server']);
 
-ok(@{$hosts}, '... and we can fetch host data from the server');
+is(@{$hosts}, 2, '... and we can fetch host data from the server');
 
-is_deeply($hosts, [
-              {
-                  'port' => '10050',
-                  'macros' => [],
-                  'ip' => '127.0.0.1',
-                  'status' => '0',
-                  'hostid' => '10047',
-                  'error' => '',
-                  'host' => 'Zibbax Server'
-              },
-              {
-                  'port' => '10050',
-                  'macros' => [
-                      {
-                          'value' => '50',
-                          'hostmacroid' => '1',
-                          'macro' => '{$CAPPED_BITRATE}'
-                      },
-                      {
-                          'value' => '5',
-                          'hostmacroid' => '2',
-                          'macro' => '{$CAPPED_BITRATE_TOLERANCE_DOWN}'
-                      },
-                      {
-                          'value' => '5',
-                          'hostmacroid' => '3',
-                          'macro' => '{$CAPPED_BITRATE_TOLERANCE_UP}'
-                      }
-                      ],
-                  'ip' => '127.0.0.1',
-                  'status' => '0',
-                  'hostid' => '10017',
-                  'error' => '',
-                  'host' => 'Zabbix Server'
-              }
-          ],
-          '... and the data fetched is correct');
+isa_ok($hosts->[0], 'Zabbix::Host',
+       '... and the object returned');

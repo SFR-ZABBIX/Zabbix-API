@@ -8,12 +8,11 @@ use Params::Validate qw/:all/;
 use Carp;
 use Data::Dumper;
 
-use parent 'Exporter';
-our @EXPORT = qw/zabbix_get/;
-our @EXPORT_OK = qw/zabbix_auth_cookie/;
-
 use JSON;
 use LWP::UserAgent;
+
+use Zabbix::Item;
+use Zabbix::Host;
 
 sub new {
 
@@ -129,8 +128,6 @@ sub get_items {
                                            optional => 1 },
                               key => { TYPE => SCALAR } });
 
-    my @allowed_keys = qw/data_type formula key_ description params lastvalue status error hostid itemid units/;
-
     my $items;
 
     if (exists $args{'host'} and !exists $args{'hostids'}) {
@@ -157,17 +154,7 @@ sub get_items {
 
     }
 
-    foreach my $item (@{$items}) {
-
-        foreach my $key (keys %{$item}) {
-
-            delete $item->{$key} unless $key ~~ @allowed_keys;
-
-        }
-
-    }
-
-    return $items;
+    return [ map { Zabbix::Item->new(%{$_}) } @{$items} ];
 
 }
 
@@ -177,24 +164,12 @@ sub get_hosts {
 
     my %args = validate(@_, { hostnames => { TYPE => ARRAYREF } });
 
-    my @allowed_keys = qw/port ip status hostid error macros host/;
-
     my $hosts = $self->get(method => 'host.get',
                            params => { filter => { host => $args{'hostnames'} },
                                        output => 'extend',
                                        select_macros => 'extend' });
 
-    foreach my $host (@{$hosts}) {
-
-        foreach my $key (keys %{$host}) {
-
-            delete $host->{$key} unless $key ~~ @allowed_keys;
-
-        }
-
-    }
-
-    return $hosts;
+    return [ map { Zabbix::Host->new(%{$_}) } @{$hosts} ];
 
 }
 

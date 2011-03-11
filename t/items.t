@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Exception;
 
 use_ok('Zabbix');
@@ -15,6 +15,9 @@ my $items = $zabber->get_items(host => 'Zabbix Server',
                                key => 'system.uptime');
 
 is(@{$items}, 1, '... and we can fetch item data from a single host with named-host-style invocation');
+
+isa_ok($items->[0], 'Zabbix::Item',
+       '... and the object returned');
 
 my $hosts = $zabber->get_hosts(hostnames => ['Zabbix Server', 'Zibbax Server']);
 
