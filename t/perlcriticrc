@@ -1,2 +1,4 @@
 severity = harsh
 verbose = 9
+
+[-Subroutines::RequireArgUnpacking]
