@@ -34,6 +34,8 @@ sub new {
 
     bless $self, $class;
 
+    return $self;
+
 }
 
 sub has_cookie {
@@ -57,6 +59,8 @@ sub authenticate {
     $self->{cookie} = '';
     $self->{cookie} = decode_json($response->decoded_content)->{result}
       if $response->is_success;
+
+    return $self;
 
 }
 
@@ -131,7 +135,7 @@ sub get_items {
 
     my $items;
 
-    if (exists $args{'host'} and !exists $args{'hostids'}) {
+    if (exists $args{'host'} and not exists $args{'hostids'}) {
 
         $items = $self->get(method => 'item.get',
                             params => {
@@ -140,7 +144,7 @@ sub get_items {
                                 output => 'extend',
                             });
 
-    } elsif (exists $args{'hostids'} and !exists $args{'host'}) {
+    } elsif (exists $args{'hostids'} and not exists $args{'host'}) {
 
         $items = $self->get(method => 'item.get',
                             params => {
@@ -173,14 +177,14 @@ sub get_hosts {
 
     my $hosts;
 
-    if (exists $args{'hostnames'} and !exists $args{'hostids'}) {
+    if (exists $args{'hostnames'} and not exists $args{'hostids'}) {
 
         $hosts = $self->get(method => 'host.get',
                             params => { filter => { host => $args{'hostnames'} },
                                         output => 'extend',
                                         select_macros => 'extend' });
 
-    } elsif (exists $args{'hostids'} and !exists $args{'hostnames'}) {
+    } elsif (exists $args{'hostids'} and not exists $args{'hostnames'}) {
 
         $hosts = $self->get(method => 'host.get',
                             params => { hostids => $args{'hostids'},
