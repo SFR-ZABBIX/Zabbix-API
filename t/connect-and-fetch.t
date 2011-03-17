@@ -1,8 +1,20 @@
-use Test::More tests => 7;
+use Test::More;
 
-BEGIN { use_ok 'Zabbix' };
+if ($ENV{ZABBIX_SERVER}) {
+    
+    plan tests => 7;
 
-my $zabber = new_ok('Zabbix', [ server => 'http://192.168.30.217/zabbix/api_jsonrpc.php' ]);
+} else {
+
+    plan skip_all => 'Needs an URL in $ENV{ZABBIX_SERVER} to run tests.';
+
+}
+
+use_ok 'Zabbix';
+
+skip 'Needs an URL in $ENV{ZABBIX_SERVER} to run tests.', 6 unless $ENV{ZABBIX_SERVER};
+
+my $zabber = new_ok('Zabbix', [ server => $ENV{ZABBIX_SERVER} ]);
 
 ok($zabber->get(method => 'apiinfo.version'),
    '... and querying Zabbix with a public method succeeds');

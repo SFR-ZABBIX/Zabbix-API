@@ -1,5 +1,15 @@
-use Test::More tests => 7;
+use Test::More;
 use Test::Exception;
+
+if ($ENV{ZABBIX_SERVER}) {
+
+    plan tests => 7;
+
+} else {
+
+    plan skip_all => 'Needs an URL in $ENV{ZABBIX_SERVER} to run tests.';
+
+}
 
 use_ok('Zabbix');
 
@@ -32,7 +42,7 @@ isa_ok($extra, 'Zabbix::Host',
 ok(!exists $extra->{extra},
    '... and it does not keep those extra parameters');
 
-my $zabber = Zabbix->new(server => 'http://192.168.30.217/zabbix/api_jsonrpc.php',
+my $zabber = Zabbix->new(server => $ENV{ZABBIX_SERVER},
                          verbosity => 0);
 
 $zabber->authenticate(user => 'api',
