@@ -63,41 +63,54 @@ Zabbix::Item -- Base class for Zabbix items
 
 =head1 SYNOPSIS
 
-  use Zabbix::Item;
+  use Zabbix;
 
-  # TODO write the rest
+  my $zabbix = Zabbix->new(...);
+
+  my $items = $zabbix->get_items(key => 'system.uptime');
 
 =head1 DESCRIPTION
 
-TODO write this
+This class doesn't do much beyond blessing a hashref of data (provided by the
+Zabbix API).
 
 =head1 ATTRIBUTES
 
-=over 4
-
-=item attribute1
-
-TODO write this
-
-=item attribute2
-
-TODO write this
-
-=back
+None.
 
 =head1 METHODS
 
 =over 4
 
-=item method(args)
+=item new(%params)
 
-TODO write this
+This is the main constructor for the Zabbix::Item class.  The following
+parameters are required at present: _root data_type formula key_ description
+params lastvalue status error hostid itemid units.
+
+All these can be fetched through the API with the C<item.get> JSON-RPC method,
+although the Zabbix C<get_items> method is more convenient (it also returns
+Zabbix::Item instances rather than raw hashrefs).
+
+The constructor filters the parameters hash so that only the required keys are
+present before the blessed ref is returned.  An exception will be thrown if
+one or more required keys are missing:
+
+  "$class->new is missing parameters: ..."
+
+=item get_host
+
+Return the item's host.  Behind the scenes, this calls the Zabbix root
+instance to perform a C<get_host> call.  Future versions may cache some data
+to improve performance.
 
 =back
 
 =head1 SEE ALSO
 
-TODO links to other pods and documentation
+L<Zabbix>, L<Zabbix::Host>
+
+The Zabbix API documentation, at L<http://www.zabbix.com/documentation/start>
 
 =head1 AUTHOR
 
