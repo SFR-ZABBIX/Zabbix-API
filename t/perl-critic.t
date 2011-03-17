@@ -1,6 +1,8 @@
 use File::Spec;
 use Test::More;
 
+plan skip_all => 'Author test. Set $ENV{AUTHOR_TESTS} to a true value to run.' unless $ENV{AUTHOR_TESTS};
+
 eval { require Test::Perl::Critic; };
 
 if ($@) {
