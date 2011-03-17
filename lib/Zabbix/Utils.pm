@@ -1,5 +1,8 @@
 package Zabbix::Utils;
 
+use strict;
+use warnings;
+
 use parent 'Exporter';
 
 our @EXPORT_OK = qw($RE_FORMULA);
