@@ -11,10 +11,10 @@ if ($ENV{ZABBIX_SERVER}) {
 
 }
 
-use_ok('Zabbix');
+use_ok('Zabbix::API');
 
-my $zabber = Zabbix->new(server => $ENV{ZABBIX_SERVER},
-                         verbosity => 0);
+my $zabber = Zabbix::API->new(server => $ENV{ZABBIX_SERVER},
+                              verbosity => 0);
 
 $zabber->authenticate(user => 'api',
                       password => 'quack');
@@ -28,7 +28,7 @@ is(@{$items}, 1, '... and we can fetch item data from a single host with named-h
 
 my $zabbix_uptime = $items->[0];
 
-isa_ok($zabbix_uptime, 'Zabbix::Item',
+isa_ok($zabbix_uptime, 'Zabbix::API::Item',
        '... and the object returned');
 
 my $hosts = $zabber->get_hosts(hostnames => ['Zabbix Server', 'Zibbax Server']);

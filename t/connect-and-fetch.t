@@ -10,11 +10,11 @@ if ($ENV{ZABBIX_SERVER}) {
 
 }
 
-use_ok 'Zabbix';
+use_ok 'Zabbix::API';
 
 skip 'Needs an URL in $ENV{ZABBIX_SERVER} to run tests.', 6 unless $ENV{ZABBIX_SERVER};
 
-my $zabber = new_ok('Zabbix', [ server => $ENV{ZABBIX_SERVER} ]);
+my $zabber = new_ok('Zabbix::API', [ server => $ENV{ZABBIX_SERVER} ]);
 
 ok($zabber->get(method => 'apiinfo.version'),
    '... and querying Zabbix with a public method succeeds');

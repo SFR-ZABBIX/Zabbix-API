@@ -1,4 +1,4 @@
-package Zabbix::Host;
+package Zabbix::API::Host;
 
 use strict;
 use warnings;

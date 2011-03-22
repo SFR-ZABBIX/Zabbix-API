@@ -1,6 +1,6 @@
 use Test::More tests => 2;
 
-use_ok('Zabbix::Utils', qw/$RE_FORMULA/);
+use_ok('Zabbix::API::Utils', qw/$RE_FORMULA/);
 
 my $regexp = $RE_FORMULA;
 

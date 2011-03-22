@@ -1,4 +1,4 @@
-package Zabbix;
+package Zabbix::API;
 
 use strict;
 use warnings;
@@ -12,8 +12,8 @@ use Scalar::Util qw/weaken/;
 use JSON;
 use LWP::UserAgent;
 
-use Zabbix::Item;
-use Zabbix::Host;
+use Zabbix::API::Item;
+use Zabbix::API::Host;
 
 sub new {
 
@@ -162,7 +162,7 @@ sub get_items {
     my $weak_ref_to_self = $self;
     weaken $weak_ref_to_self;
 
-    return [ map { Zabbix::Item->new(_root => $weak_ref_to_self, %{$_}) } @{$items} ];
+    return [ map { Zabbix::API::Item->new(_root => $weak_ref_to_self, %{$_}) } @{$items} ];
 
 }
 
@@ -200,7 +200,7 @@ sub get_hosts {
     my $weak_ref_to_self = $self;
     weaken $weak_ref_to_self;
 
-    return [ map { Zabbix::Host->new(_root => $weak_ref_to_self, %{$_}) } @{$hosts} ];
+    return [ map { Zabbix::API::Host->new(_root => $weak_ref_to_self, %{$_}) } @{$hosts} ];
 
 }
 

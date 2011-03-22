@@ -1,4 +1,4 @@
-package Zabbix::Item;
+package Zabbix::API::Item;
 
 use strict;
 use warnings;
