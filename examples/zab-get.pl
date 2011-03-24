@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use 5.010;
 
-use Zabbix;
-use Zabbix::Utils qw/$RE_FORMULA/;
+use Zabbix::API;
+use Zabbix::API::Utils qw/$RE_FORMULA/;
 use Data::Dumper;
 use Getopt::Long::Descriptive;
 use DateTime;
@@ -18,8 +18,8 @@ my ($opt, $usage) = describe_options(
 
 say $usage and exit if $opt->help;
 
-my $zabber = Zabbix->new(server => $opt->server,
-                         verbosity => $opt->verbose // 0);
+my $zabber = Zabbix::API->new(server => $opt->server,
+                              verbosity => $opt->verbose // 0);
 
 $zabber->authenticate(user => 'api',
                       password => 'quack');
