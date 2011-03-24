@@ -210,14 +210,14 @@ __END__
 
 =head1 NAME
 
-Zabbix -- Access the JSON-RPC API of a Zabbix server
+Zabbix::API -- Access the JSON-RPC API of a Zabbix server
 
 =head1 SYNOPSIS
 
-  use Zabbix;
+  use Zabbix::API;
 
-  my $zabbix = Zabbix->new(server => 'http://example.com/zabbix/api_jsonrpc.php',
-                           verbosity => 0);
+  my $zabbix = Zabbix::API->new(server => 'http://example.com/zabbix/api_jsonrpc.php',
+                                verbosity => 0);
 
   $zabbix->authenticate(user => 'calvin',
                         password => 'hobbes');
@@ -238,10 +238,10 @@ have no JSON-RPC API at all.)
 
 =item new(server => URL, [verbosity => INT])
 
-This is the main constructor for the Zabbix class.  It creates a
+This is the main constructor for the Zabbix::API class.  It creates a
 LWP::UserAgent instance but does B<not> open any connections yet.
 
-Returns an instance of the C<Zabbix> class.
+Returns an instance of the C<Zabbix::API> class.
 
 =item authenticate(user => STR, password => STR)
 
