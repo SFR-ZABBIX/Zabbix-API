@@ -5,10 +5,9 @@ use warnings;
 
 use parent 'Exporter';
 
-our @EXPORT_OK = qw($RE_FORMULA);
+our @EXPORT_OK = qw(RE_FORMULA);
 
-# TODO: rendre les guillemets optionnels, support de plusieurs function_args
-our $RE_FORMULA =
+use constant RE_FORMULA =>
     qr/(?<function_call>\w+\(
          (?<function_args>"
            (?<host>[\w ._-]+)
@@ -20,6 +19,8 @@ our $RE_FORMULA =
          ")
        \))/x;
 
+# TODO: rendre les guillemets optionnels, support de plusieurs function_args
+
 1;
 __END__
 =pod
@@ -30,9 +31,11 @@ Zabbix::Utils -- Useful miscellanea related to Zabbix
 
 =head1 SYNOPSIS
 
-  use Zabbix::Utils qw/$RE_FORMULA/;
+  use Zabbix::Utils qw/RE_FORMULA/;
 
-  while ($formula =~ m/$RE_FORMULA/g) {
+  my $regexp = RE_FORMULA;
+
+  while ($formula =~ m/$regexp/g) {
 
       my %this_match = %+;
 

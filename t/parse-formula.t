@@ -1,8 +1,11 @@
 use Test::More tests => 2;
 
-use_ok('Zabbix::API::Utils', qw/$RE_FORMULA/);
+use strict;
+use warnings;
 
-my $regexp = $RE_FORMULA;
+BEGIN { use_ok('Zabbix::API::Utils', qw/RE_FORMULA/); }
+
+my $regexp = RE_FORMULA;
 
 my $string = q{last("Zabbix Server:net.if.in[eth0,bytes]")+last("Zibbax Server:do.stuff[bytes,lo0]")-blah("Nono le Robot:reticulate.splines[eth2,clous]")};
 
