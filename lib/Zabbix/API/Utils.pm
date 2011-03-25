@@ -9,14 +9,17 @@ our @EXPORT_OK = qw(RE_FORMULA);
 
 use constant RE_FORMULA =>
     qr/(?<function_call>\w+\(
-         (?<function_args>"
-           (?<host>[\w ._-]+)
+         (?<function_args_quote>['"]?)
+         (?<function_args>
+           ((?<host>[\w ._-]+)
            :
            (?<item>[\w.,_]+)
            \[
              (?<item_arg>(\w+)(,(\w+))*)
-           \]
-         ")
+           \])
+           |
+           .*?)
+         \g{function_args_quote}
        \))/x;
 
 # TODO: rendre les guillemets optionnels, support de plusieurs function_args
