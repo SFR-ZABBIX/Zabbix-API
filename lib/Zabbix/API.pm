@@ -123,6 +123,16 @@ sub get {
 
 }
 
+sub api_version {
+
+    my $self = shift;
+
+    my $response = $self->get(method => 'apiinfo.version');
+
+    return $response;
+
+}
+
 sub get_items {
 
     my $self = shift;
