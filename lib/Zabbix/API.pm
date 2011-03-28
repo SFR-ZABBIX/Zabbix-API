@@ -158,8 +158,9 @@ sub get_items {
 
         $items = $self->get(method => 'item.get',
                             params => {
-                                filter => { hostids => $args{'hostids'},
-                                            key_ => $args{'key'} },
+                                filter => { key_ => $args{'key'} },
+                                hostids => [ map { $_ } @{$args{'hostids'}} ],
+                                select_hosts => 'extend',
                                 output => 'extend',
                             });
 
