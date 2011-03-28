@@ -290,6 +290,10 @@ C<params> argument.
 
 =over 4
 
+=item api_version
+
+Query the Zabbix server for the API version number and return it.
+
 =item get_items(key => STR, [host => ZABBIX_HOST], [hostids => ARRAYREF])
 
 Return an arrayref of hashrefs of data from Zabbix items.
