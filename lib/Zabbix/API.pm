@@ -19,16 +19,19 @@ sub new {
 
     my $class = shift;
     my %args = validate(@_, { server => 1,
-                              verbosity => 0, });
+                              verbosity => 0,
+                              env_proxy => 0 });
 
     my $self = \%args;
 
     # defaults
     $self->{verbosity} = 0 unless exists $self->{verbosity};
+    $self->{env_proxy} = 0 unless exists $self->{env_proxy};
 
     $self->{ua} = LWP::UserAgent->new(agent => 'Zabbix API client (libwww-perl)',
                                       from => 'fabrice.gabolde@uperto.com',
-                                      show_progress => $self->{verbosity});
+                                      show_progress => $self->{verbosity},
+                                      env_proxy => $self->{env_proxy},);
 
     $self->{cookie} = '';
 
@@ -247,10 +250,12 @@ have no JSON-RPC API at all.)
 
 =over 4
 
-=item new(server => URL, [verbosity => INT])
+=item new(server => URL, [verbosity => INT], [env_proxy => BOOL])
 
 This is the main constructor for the Zabbix::API class.  It creates a
 LWP::UserAgent instance but does B<not> open any connections yet.
+C<env_proxy> is passed to the LWP::UserAgent constructor, so if it is set to a
+true value then the UA should follow C<$http_proxy> and others.
 
 Returns an instance of the C<Zabbix::API> class.
 
