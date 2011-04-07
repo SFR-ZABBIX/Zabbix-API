@@ -20,7 +20,7 @@ ok($zabber->get(method => 'apiinfo.version'),
    '... and querying Zabbix with a public method succeeds');
 
 $zabber->authenticate(user => 'api',
-                    password => 'kweh');
+                      password => 'kweh');
 
 ok(!$zabber->has_cookie,
    '... and authenticating with incorrect login/pw fails');
