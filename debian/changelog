@@ -1,0 +1,5 @@
+libzabbix-api-perl (0.002-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Marc Dequènes (Duck) <mdequenes@uperto.com>  Thu, 7 Apr 2011 15:37:45 +0200

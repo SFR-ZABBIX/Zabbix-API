@@ -1,0 +1,28 @@
+Source: libzabbix-api-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: libjson-perl,
+ libparams-validate-perl,
+ libtest-exception-perl,
+ libwww-perl,
+ perl (>= 5.10.0),
+ perl (>= 5.10.1) | libparent-perl
+Maintainer: Marc Dequènes (Duck) <mdequenes@uperto.com>
+Standards-Version: 3.9.1
+Homepage: http://search.cpan.org/dist/Zabbix-API/
+
+Package: libzabbix-api-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libjson-perl,
+ libparams-validate-perl,
+ libwww-perl,
+ perl (>= 5.10.0),
+ perl (>= 5.10.1) | libparent-perl
+Description: Access the JSON-RPC API of a Zabbix server
+ Zabbix::API manages authentication and querying to a Zabbix server via its
+ JSON-RPC interface. (Zabbix v1.8+ is required for API usage; prior versions
+ have no JSON-RPC API at all.)
+ .
+ This description was automagically extracted from the module by dh-make-perl.
