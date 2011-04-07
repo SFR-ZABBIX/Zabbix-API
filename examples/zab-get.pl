@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 
 use Zabbix::API;
-use Zabbix::API::Utils qw/$RE_FORMULA/;
+use Zabbix::API::Utils qw/RE_FORMULA/;
 use Data::Dumper;
 use Getopt::Long::Descriptive;
 use DateTime;
@@ -25,15 +25,6 @@ $zabber->authenticate(user => 'api',
                       password => 'quack');
 
 die 'no cookie :(' unless $zabber->has_cookie;
-
-# my $things = $zabber->get(method => 'item.get',
-#                           params => { output => 'extend' });
-
-# $things = [ grep { @{$_->{hosts}} > 1 } @{$things} ];
-
-# print Dumper($things);
-
-# exit;
 
 my $items = $zabber->get_items(host => 'Zabbix Server',
                                key => 'thing');
@@ -55,7 +46,9 @@ foreach my $item (@{$items}) {
 
         my @hosts;
 
-        while ($item->{params} =~ m/$RE_FORMULA/g) {
+        my $re = RE_FORMULA;
+
+        while ($item->{params} =~ m/$re/g) {
 
             my ($host, $item_arg) = @+{'host', 'item_arg'};
 
