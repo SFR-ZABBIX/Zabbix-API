@@ -238,7 +238,7 @@ Zabbix::API -- Access the JSON-RPC API of a Zabbix server
 
   die 'could not authenticate' unless $zabbix->has_cookie;
 
-  my $things = $zabber->get(method => 'apiinfo.version');
+  my $things = $zabbix->get(method => 'apiinfo.version');
 
 =head1 DESCRIPTION
 
@@ -345,6 +345,11 @@ unauthenticated.
 The LWP::UserAgent object that handles HTTP queries and responses.  This is
 probably the most interesting attribute since several useful options can be
 set: timeout, redirects, etc.
+
+=item env_proxy
+
+Direct access to the LWP::UserAgent B<initial> configuration regarding
+proxies.  Setting this attribute after construction does nothing.
 
 =back
 
