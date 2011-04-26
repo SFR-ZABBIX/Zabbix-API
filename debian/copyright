@@ -4,11 +4,11 @@ Source: http://search.cpan.org/dist/Zabbix-API/
 Name: Zabbix-API
 
 Files: *
-Copyright: Fabrice Gabolde <fabrice.gabolde@uperto.com>
+Copyright: 2011, SFR
 License: Artistic or GPL-1+
 
 Files: debian/*
-Copyright: 2011, Marc Dequènes (Duck) <mdequenes@uperto.com>
+Copyright: 2011, SFR
 License: GPL-3+
 
 License: Artistic

@@ -365,7 +365,7 @@ Fabrice Gabolde <fabrice.gabolde@uperto.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 by Fabrice Gabolde
+Copyright (C) 2010 SFR
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself, either Perl version 5.10.0 or, at your option,
