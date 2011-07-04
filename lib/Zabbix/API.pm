@@ -306,16 +306,17 @@ Return an arrayref of hashrefs of data from Zabbix items.
 The host-name-style (with C<host>) fetches data for a single host (the API
 doesn't support filtering by more than one host by name; maybe we will later,
 through a cache of hostid => hostname, or by calling C<get_hosts> behind the
-scenes, which would be very slow.)
+scenes, which would be very slow).
 
 The hostids-style (with C<hostids>) fetches data for multiple hosts (the API
 B<does> support filtering by more than one host by IDs).
 
 Exactly one of C<host> and C<hostids> must be specified.
 
-=item get_hosts(hostnames => ARRAYREF)
+=item get_hosts([hostnames => ARRAYREF], [hostids => ARRAYREF])
 
-Return an arrayref of hashrefs of data from Zabbix hosts.
+Return an arrayref of hashrefs of data from Zabbix hosts.  Exactly one of
+C<hostnames> and C<hostids> must be specified.
 
 =back
 
