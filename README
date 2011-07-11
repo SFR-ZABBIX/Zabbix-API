@@ -1,0 +1,20 @@
+Zabbix::API
+
+* About Zabbix::API
+
+Zabbix is a free software monitoring solution.  This distribution is an
+abstraction layer over the JSON-RPC API provided by Zabbix, allowing you to log
+in, create, update, delete, and generally manipulate many (but as of yet not
+all) types of objects, all in Perl with Perlish constructs.
+
+Examples are available in the examples/ folder; the tests are also good material
+to start with.
+
+* About us
+
+This distribution was originally written by Uperto for SFR, a French ISP and
+telecom.
+
+* Bugs and complaints
+
+We have the usual RT queue on rt.cpan.org.

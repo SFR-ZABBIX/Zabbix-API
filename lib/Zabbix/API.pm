@@ -12,6 +12,8 @@ use Scalar::Util qw/weaken/;
 use JSON;
 use LWP::UserAgent;
 
+our $VERSION = '0.003';
+
 sub new {
 
     my $class = shift;
@@ -414,9 +416,31 @@ proxies.  Setting this attribute after construction does nothing.
 
 =back
 
-=head1 BUGS
+=head1 BUGS AND MISSING FEATURES
 
-This doesn't use Moose.
+=head2 MOOSE, ABSENCE OF
+
+The distribution doesn't use Moose, because it was written with light
+dependencies in mind.  This is actually a problem in that I do not have the time
+to write proper accessors to cover all types of manipulations one might expect
+on, for instance, a graph's items.  Hence to push (in the stack sense) a new
+item into a graph's list of items, you have to use the push builtin on the
+dereferenced items mutator, instead of writing something like
+
+  $graph->items->push($foo);
+
+which would be easy to allow with Moose traits.  Plus, I had to write
+boilerplate validation code, which would have been taken care of by Moose at
+least where types and type coercions are concerned.
+
+=head2 BUGS THAT ARE NOT RELATED TO THE ABSENCE OF MOOSE
+
+It is quite slow.  The server itself does not appear to be lightning fast; at
+least a recent Zabbix (1.8.5) on a Debian squeeze VM takes a couple seconds to
+reply to even trivial JSON-RPC queries.  This is compounded by the fact that
+Zabbix::API is being extra paranoid about default values and tries to C<pull()>
+every time it is relatively safe to do so, for instance immediately after a
+C<push()>.
 
 Several types of objects are not implemented in this distribution; feel free to
 contribute them or write your own distribution (see L<Zabbix::API::CRUDE> for

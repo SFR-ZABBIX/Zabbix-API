@@ -1,3 +1,8 @@
+July 11, 2011 - Version 0.003
+  * Mostly completed a distribution-wide rewrite
+  * Broke backwards compatibility
+  * More unit tests
+
 March 25, 2011 - Version 0.002
   * More PBP-compliance, kwalitee
   * Fixed bugs
