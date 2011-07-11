@@ -5,15 +5,12 @@ use warnings;
 use 5.010;
 
 use Params::Validate qw/:all/;
-use Carp;
+use Carp qw/carp croak confess cluck/;
 use Data::Dumper;
 use Scalar::Util qw/weaken/;
 
 use JSON;
 use LWP::UserAgent;
-
-use Zabbix::API::Item;
-use Zabbix::API::Host;
 
 sub new {
 
@@ -28,6 +25,8 @@ sub new {
     $self->{verbosity} = 0 unless exists $self->{verbosity};
     $self->{env_proxy} = 0 unless exists $self->{env_proxy};
 
+    $self->{stash} = {};
+
     $self->{ua} = LWP::UserAgent->new(agent => 'Zabbix API client (libwww-perl)',
                                       from => 'fabrice.gabolde@uperto.com',
                                       show_progress => $self->{verbosity},
@@ -41,7 +40,35 @@ sub new {
 
 }
 
-sub has_cookie {
+sub reference {
+
+    my ($self, $thing) = @_;
+
+    $self->{stash}->{$thing->prefix}->{$thing->id} = $thing;
+
+    return $self;
+
+}
+
+sub dereference {
+
+    my ($self, $thing) = @_;
+
+    delete $self->{stash}->{$thing->prefix}->{$thing->id};
+
+    return $self;
+
+}
+
+sub refof {
+
+    my ($self, $thing) = @_;
+
+    return $self->{stash}->{$thing->prefix}->{$thing->id};
+
+}
+
+sub cookie {
 
     my $self = shift;
 
@@ -49,25 +76,51 @@ sub has_cookie {
 
 }
 
-sub authenticate {
+sub login {
 
     my $self = shift;
 
     my %args = validate(@_, { user => 1,
                               password => 1 });
 
-    my $response = $self->query(method => 'user.authenticate',
-                                params => \%args);
+    my $response = $self->raw_query(method => 'user.login',
+                                    params => \%args);
 
     $self->{cookie} = '';
-    $self->{cookie} = decode_json($response->decoded_content)->{result}
-      if $response->is_success;
+
+    my $decoded = decode_json($response->decoded_content);
+
+    if ($decoded->{error}) {
+
+        croak 'Could not log in: '.$decoded->{error}->{data};
+
+    }
+
+    $self->{cookie} = $decoded->{result};
 
     return $self;
 
 }
 
-sub query {
+sub logout {
+
+    my $self = shift;
+
+    my $decoded = decode_json($self->raw_query(method => 'user.logout')->decoded_content);
+
+    if ($decoded->{error}) {
+
+        croak 'Could not log out: '.$decoded->{error}->{data};
+
+    }
+
+    $self->{cookie} = '';
+
+    return $self;
+
+}
+
+sub raw_query {
 
     my ($self, %args) = @_;
 
@@ -75,12 +128,24 @@ sub query {
 
     # common parameters
     $args{'jsonrpc'} = '2.0';
-    $args{'auth'} = $self->{cookie} if $self->has_cookie;
+    $args{'auth'} = $self->cookie || '';
     $args{'id'} = $global_id++;
 
-    my $response = $self->{ua}->post($self->{server},
-                                     'Content-Type' => 'application/json-rpc',
-                                     Content => encode_json(\%args));
+    my $response = eval { $self->{ua}->post($self->{server},
+                                            'Content-Type' => 'application/json-rpc',
+                                            Content => encode_json(\%args)) };
+
+    if ($@) {
+
+        my $error = $@;
+
+        cluck $error;
+
+        warn "Data was:\n".Dumper(\%args);
+
+        die 'and now we relinquish control';
+
+    }
 
     given ($self->{verbosity}) {
 
@@ -106,7 +171,7 @@ sub query {
 
 }
 
-sub get {
+sub query {
 
     my $self = shift;
 
@@ -114,15 +179,23 @@ sub get {
                               params => { TYPE => HASHREF,
                                           optional => 1 }});
 
-    my $response = $self->query(%args);
+    my $response = $self->raw_query(%args);
 
     if ($response->is_success) {
 
-        return decode_json($response->decoded_content)->{'result'};
+        my $decoded = decode_json($response->decoded_content);
+
+        if ($decoded->{error}) {
+
+            croak 'Zabbix server replied: '.$decoded->{error}->{data};
+
+        }
+
+        return $decoded->{result};
 
     }
 
-    return 0;
+    croak 'Received HTTP error: '.$response->decoded_content;
 
 }
 
@@ -130,91 +203,53 @@ sub api_version {
 
     my $self = shift;
 
-    my $response = $self->get(method => 'apiinfo.version');
+    my $response = $self->query(method => 'apiinfo.version');
 
     return $response;
 
 }
 
-sub get_items {
+sub fetch {
 
-    my $self = shift;
+    my ($self, $class, %args) = @_;
 
-    my %args = validate(@_, { host => { TYPE => SCALAR,
-                                        optional => 1 },
-                              hostids => { TYPE => ARRAYREF,
-                                           optional => 1 },
-                              key => { TYPE => SCALAR } });
+    $class =~ s/^(?:Zabbix::API::)?/Zabbix::API::/;
 
-    my $items;
+    ## no critic (ProhibitStringyEval)
+    eval "require $class";
+    ## use critic
 
-    if (exists $args{'host'} and not exists $args{'hostids'}) {
+    if ($@) {
 
-        $items = $self->get(method => 'item.get',
-                            params => {
-                                filter => { host => $args{'host'},
-                                            key_ => $args{'key'} },
-                                output => 'extend',
-                            });
+        my $error = $@;
 
-    } elsif (exists $args{'hostids'} and not exists $args{'host'}) {
-
-        $items = $self->get(method => 'item.get',
-                            params => {
-                                filter => { key_ => $args{'key'} },
-                                hostids => [ map { $_ } @{$args{'hostids'}} ],
-                                select_hosts => 'extend',
-                                output => 'extend',
-                            });
-
-    } else {
-
-        croak q{Exactly one of 'host' or 'hostids' must be specified as a parameter to get_items};
+        croak qq{Could not load class '$class': $error};
 
     }
 
-    my $weak_ref_to_self = $self;
-    weaken $weak_ref_to_self;
+    my $response = $self->query(method => $class->prefix('.get'),
+                                params => {
+                                    %{$args{params}},
+                                    $class->extension
+                                });
 
-    return [ map { Zabbix::API::Item->new(_root => $weak_ref_to_self, %{$_}) } @{$items} ];
+    my $things = [ map { $class->new(root => $self, data => $_)  } @{$response} ];
 
-}
+    foreach my $thing (@{$things}) {
 
-sub get_hosts {
+        if (my $replacement = $self->refof($thing)) {
 
-    my $self = shift;
+            $thing = $replacement;
 
-    my %args = validate(@_, { hostnames => { TYPE => ARRAYREF,
-                                             optional => 1 },
-                              hostids => { TYPE => ARRAYREF,
-                                           optional => 1 } });
+        } else {
 
-    my $hosts;
+            $self->reference($thing);
 
-    if (exists $args{'hostnames'} and not exists $args{'hostids'}) {
-
-        $hosts = $self->get(method => 'host.get',
-                            params => { filter => { host => $args{'hostnames'} },
-                                        output => 'extend',
-                                        select_macros => 'extend' });
-
-    } elsif (exists $args{'hostids'} and not exists $args{'hostnames'}) {
-
-        $hosts = $self->get(method => 'host.get',
-                            params => { hostids => $args{'hostids'},
-                                        output => 'extend',
-                                        select_macros => 'extend' });
-
-    } else {
-
-        croak q{Exactly one of 'hostnames' or 'hostids' must be specified as a parameter to get_items};
+        }
 
     }
-    
-    my $weak_ref_to_self = $self;
-    weaken $weak_ref_to_self;
 
-    return [ map { Zabbix::API::Host->new(_root => $weak_ref_to_self, %{$_}) } @{$hosts} ];
+    return $things;
 
 }
 
@@ -233,12 +268,12 @@ Zabbix::API -- Access the JSON-RPC API of a Zabbix server
   my $zabbix = Zabbix::API->new(server => 'http://example.com/zabbix/api_jsonrpc.php',
                                 verbosity => 0);
 
-  $zabbix->authenticate(user => 'calvin',
-                        password => 'hobbes');
+  eval { $zabbix->login(user => 'calvin',
+                        password => 'hobbes') };
 
-  die 'could not authenticate' unless $zabbix->has_cookie;
+  if ($@) { die 'could not authenticate' };
 
-  my $things = $zabbix->get(method => 'apiinfo.version');
+  my $items = $zabbix->fetch('Item', params => { search => { ... } });
 
 =head1 DESCRIPTION
 
@@ -259,17 +294,26 @@ true value then the UA should follow C<$http_proxy> and others.
 
 Returns an instance of the C<Zabbix::API> class.
 
-=item authenticate(user => STR, password => STR)
+=item login(user => STR, password => STR)
 
 Send login information to the Zabbix server and set the auth cookie if the
 authentication was successful.
 
-=item has_cookie
+Due to the current state of flux of the Zabbix API, this may or may not work
+depending on your version of Zabbix.  C<user.authenticate> is marked as having
+been introduced in version 1.8; so is C<user.login>, which deprecates
+C<authenticate>.  Our method uses C<login>.  Version 1.8.4 is confirmed as
+working with C<login>.
 
-Return the current value of the auth cookie, which is a true value if the last
-authentication was successful, or the empty string otherwise.
+=item logout()
 
-=item query(method => STR, [params => HASHREF])
+Try to log out properly.  Unfortunately, the C<user.logout> method is completely
+undocumented and does not appear to work at the moment (see the bug report here:
+L<https://support.zabbix.com/browse/ZBX-3907>).  Users of this distribution are
+advised not to log out at all.  They will B<not be able to log back in> until the
+server has decided their ban period is over (around 30s).
+
+=item raw_query(method => STR, [params => HASHREF])
 
 Send a JSON-RPC query to the Zabbix server.  The C<params> hashref should
 contain the method's parameters; query parameters (query ID, auth cookie,
@@ -284,43 +328,59 @@ C<HTTP::Request> being replied to).
 If the verbosity is strictly greater than 0, the internal LWP::UserAgent
 instance will also print HTTP request progress.
 
-=item get(method => STR, [params => HASHREF])
+=item query(method => STR, [params => HASHREF])
 
-Wrapper around C<query> that will return the result data instead.
-
-=back
-
-The following methods are wrappers around C<get> that mostly curry out the
-C<params> argument.
-
-=over 4
+Wrapper around C<raw_query> that will return the decoded result data instead.
 
 =item api_version
 
 Query the Zabbix server for the API version number and return it.
 
-=item get_items(key => STR, [host => ZABBIX_HOST], [hostids => ARRAYREF])
+=item fetch(CLASS, [params => HASHREF])
 
-Return an arrayref of hashrefs of data from Zabbix items.
+This method fetches objects from the server.  The PARAMS hashref should contain
+API method parameters that identify the objects you're trying to fetch, for
+instance:
 
-The host-name-style (with C<host>) fetches data for a single host (the API
-doesn't support filtering by more than one host by name; maybe we will later,
-through a cache of hostid => hostname, or by calling C<get_hosts> behind the
-scenes, which would be very slow).
+  $zabbix->fetch('Item', params => { search => { key_ => 'system.uptime' } });
 
-The hostids-style (with C<hostids>) fetches data for multiple hosts (the API
-B<does> support filtering by more than one host by IDs).
+The method delegates a lot of work to the CLASS so that it can be as generic as
+possible.  Any CLASS name in the C<Zabbix::API> namespace is usable as long as
+it descends from C<Zabbix::API::CRUDE> (to be precise, it should implement a
+number of methods, some of which C<CRUDE> implements, some of which are provided
+by specialized subclasses provided in the distribution).  The string
+C<Zabbix::API::> will be prepended if it is missing.
 
-Exactly one of C<host> and C<hostids> must be specified.
-
-=item get_hosts([hostnames => ARRAYREF], [hostids => ARRAYREF])
-
-Return an arrayref of hashrefs of data from Zabbix hosts.  Exactly one of
-C<hostnames> and C<hostids> must be specified.
+Returns an arrayref of CLASS instances.
 
 =back
 
 =head1 LOW-LEVEL ACCESS
+
+A few methods are not intended for general consumption, but you never know.
+Plus it gives me a space to document them and raises POD coverage.
+
+=over 4
+
+=item reference(OBJECT)
+
+"Indexes" the object in a local stash.  The C<fetch> method (and the objects'
+C<pull>) plugs into this so that you have only one real object, and modifying a
+host directly and modifying an item's host (via C<< ->host >> is the same thing.
+
+=item dereference(OBJECT)
+
+Removes the object's index in the local stash.  This is called by the objects'
+C<delete> method.
+
+=item refof(OBJECT)
+
+Returns the correct reference to an object fetched from the server; in other
+words, looks in the stash for an object that has the same C<id>.  This is used
+in indexing objects, to ensure that the stashed objects are updated instead of
+just creating doubles.
+
+=back
 
 Several attributes are available if you want to dig into the class' internals,
 through the standard blessed-hash-as-an-instance mechanism.  Those are:
@@ -354,6 +414,16 @@ proxies.  Setting this attribute after construction does nothing.
 
 =back
 
+=head1 BUGS
+
+This doesn't use Moose.
+
+Several types of objects are not implemented in this distribution; feel free to
+contribute them or write your own distribution (see L<Zabbix::API::CRUDE> for
+the gory API details).
+
+The C<logout> business.
+
 =head1 SEE ALSO
 
 The Zabbix API documentation, at L<http://www.zabbix.com/documentation/start>
@@ -366,7 +436,7 @@ Fabrice Gabolde <fabrice.gabolde@uperto.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 SFR
+Copyright (C) 2011 SFR
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself, either Perl version 5.10.0 or, at your option,

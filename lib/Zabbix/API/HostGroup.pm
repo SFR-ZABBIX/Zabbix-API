@@ -1,4 +1,4 @@
-package Zabbix::API::Host;
+package Zabbix::API::HostGroup;
 
 use strict;
 use warnings;
@@ -15,12 +15,12 @@ sub id {
 
     if (defined $value) {
 
-        $self->data->{hostid} = $value;
-        return $self->data->{hostid};
+        $self->data->{groupid} = $value;
+        return $self->data->{groupid};
 
     } else {
 
-        return $self->data->{hostid};
+        return $self->data->{groupid};
 
     }
 
@@ -32,11 +32,11 @@ sub prefix {
 
     if ($suffix) {
 
-        return 'host'.$suffix;
+        return 'group'.$suffix;
 
     } else {
 
-        return 'host';
+        return 'group';
 
     }
 
@@ -44,8 +44,7 @@ sub prefix {
 
 sub extension {
 
-    return ( output => 'extend',
-             select_macros => 'extend' );
+    return ( output => 'extend' );
 
 }
 
@@ -54,7 +53,7 @@ sub collides {
     my $self = shift;
 
     return @{$self->{root}->query(method => $self->prefix('.get'),
-                                  params => { search => { host => $self->data->{host} },
+                                  params => { search => { name => $self->data->{name} },
                                               $self->extension })};
 
 }
@@ -65,19 +64,19 @@ __END__
 
 =head1 NAME
 
-Zabbix::API::Host -- Zabbix host objects
+Zabbix::API::HostGroup -- Zabbix group objects
 
 =head1 SYNOPSIS
 
-  use Zabbix::API::Host;
+  use Zabbix::API::HostGroup;
 
-  my $host = $zabbix->fetch(...);
+  my $group = $zabbix->fetch(...);
 
-  $host->delete;
+  $group->delete;
 
 =head1 DESCRIPTION
 
-Handles CRUD for Zabbix host objects.
+Handles CRUD for Zabbix group objects.
 
 This is a very simple subclass of C<Zabbix::API::CRUDE>.  Only the required
 methods are implemented (and in a very simple fashion on top of that).

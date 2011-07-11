@@ -1,13 +1,10 @@
-use Test::More;
+use Test::More tests => 8;
 use Test::Exception;
+use Data::Dumper;
 
 use Zabbix::API;
 
-if ($ENV{ZABBIX_SERVER}) {
-
-    plan tests => 7;
-
-} else {
+unless ($ENV{ZABBIX_SERVER}) {
 
     plan skip_all => 'Needs an URL in $ENV{ZABBIX_SERVER} to run tests.';
 
@@ -15,50 +12,67 @@ if ($ENV{ZABBIX_SERVER}) {
 
 use_ok('Zabbix::API::Host');
 
-isa_ok(Zabbix::API::Host->new(
-           _root => {},
-           port => 1,
-           ip => '2',
-           status => 3,
-           hostid => 4,
-           error => 5,
-           macros => [ 6, 7 ],
-           host => '8'),
-       'Zabbix::API::Host',
-       '... and a newly-built Host');
-
-my $extra = Zabbix::API::Host->new(
-    _root => {},
-    port => 1,
-    ip => '2',
-    status => 3,
-    hostid => 4,
-    error => 5,
-    macros => [ 6, 7 ],
-    host => '8',
-    extra => 9);
-
-isa_ok($extra, 'Zabbix::API::Host',
-       '... and a newly-built Host with extra parameters');
-
-ok(!exists $extra->{extra},
-   '... and it does not keep those extra parameters');
-
 my $zabber = Zabbix::API->new(server => $ENV{ZABBIX_SERVER},
-                         verbosity => 0);
+                              verbosity => $ENV{ZABBIX_VERBOSITY} || 0);
 
-$zabber->authenticate(user => 'api',
-                      password => 'quack');
+eval { $zabber->login(user => 'api',
+                      password => 'quack') };
 
-$zabber->has_cookie or BAIL_OUT('Could not authenticate, something is wrong!');
+if ($@) {
 
-my $hosts = $zabber->get_hosts(hostnames => ['Zabbix Server', 'Zibbax Server']);
+    my $error = $@;
 
-is(@{$hosts}, 2, '... and we can fetch host data from the server');
+    BAIL_OUT($error);
 
-isa_ok($hosts->[0], 'Zabbix::API::Host',
-       '... and the object returned');
+}
 
-throws_ok(sub { Zabbix::API::Host->new(port => 1, ip => '2') },
-          qr/^Zabbix::API::Host->new is missing parameters: _root status hostid error macros host\n/,
-          '... and building a new Host with too few parameters croaks');
+my $hosts = $zabber->fetch('Host', params => { host => 'Zabbix Server',
+                                               search => { host => 'Zabbix Server' } });
+
+is(@{$hosts}, 1, '... and a host known to exist can be fetched');
+
+my $zabhost = $hosts->[0];
+
+isa_ok($zabhost, 'Zabbix::API::Host',
+       '... and that host');
+
+ok($zabhost->created,
+   '... and it returns true to existence tests');
+
+my $oldip = $zabhost->data->{ip};
+
+$zabhost->data->{ip} = '255.255.255.255';
+
+$zabhost->push;
+
+$zabhost->pull;
+
+is($zabhost->data->{ip}, '255.255.255.255',
+   '... and updated data can be pushed back to the server');
+
+$zabhost->data->{ip} = $oldip;
+$zabhost->push;
+
+my $new_host = Zabbix::API::Host->new(root => $zabber,
+                                      data => { host => 'Another Server',
+                                                ip => '255.255.255.255',
+                                                groups => [ { groupid => 4 } ] });
+
+isa_ok($new_host, 'Zabbix::API::Host',
+       '... and a host created manually');
+
+eval { $new_host->push };
+
+if ($@) { diag "Caught exception: $@" };
+
+ok($new_host->created,
+   '... and pushing it to the server creates a new host');
+
+eval { $new_host->delete };
+
+if ($@) { diag "Caught exception: $@" };
+
+ok(!$new_host->created,
+   '... and calling its delete method removes it from the server');
+
+eval { $zabber->logout };

@@ -1,55 +1,86 @@
-use Test::More;
+use Test::More tests => 10;
 use Test::Exception;
+use Data::Dumper;
 
-if ($ENV{ZABBIX_SERVER}) {
+use Zabbix::API;
 
-    plan tests => 6;
-
-} else {
+unless ($ENV{ZABBIX_SERVER}) {
 
     plan skip_all => 'Needs an URL in $ENV{ZABBIX_SERVER} to run tests.';
 
 }
 
-use_ok('Zabbix::API');
+use_ok('Zabbix::API::Item');
 
 my $zabber = Zabbix::API->new(server => $ENV{ZABBIX_SERVER},
-                              verbosity => 0);
+                              verbosity => $ENV{ZABBIX_VERBOSITY} || 0);
 
-$zabber->authenticate(user => 'api',
-                      password => 'quack');
+eval { $zabber->login(user => 'api',
+                      password => 'quack') };
 
-$zabber->has_cookie or BAIL_OUT('Could not authenticate, something is wrong!');
+if ($@) {
 
-my $items = $zabber->get_items(host => 'Zabbix Server',
-                               key => 'system.uptime');
+    my $error = $@;
 
-is(@{$items}, 1, '... and we can fetch item data from a single host with named-host-style invocation');
+    BAIL_OUT($error);
+
+}
+
+my $items = $zabber->fetch('Item', params => { host => 'Zabbix Server',
+                                               search => { key_ => 'system.uptime' } });
+
+is(@{$items}, 1, '... and an item known to exist can be fetched');
 
 my $zabbix_uptime = $items->[0];
 
 isa_ok($zabbix_uptime, 'Zabbix::API::Item',
-       '... and the object returned');
+       '... and that item');
 
-my $hosts = $zabber->get_hosts(hostnames => ['Zabbix Server', 'Zibbax Server']);
+ok($zabbix_uptime->created,
+   '... and it returns true to existence tests');
 
-$items = $zabber->get_items(hostids => [ map { $_->{hostid} } @{$hosts} ],
-                            key => 'net.if.in[eth0,bytes]');
+my $host_from_item = $zabbix_uptime->host;
 
-is(@{$items}, 2, '... and we can fetch item data from multiple hosts with hostid-style invocation');
+my $host = $zabber->fetch('Host', params => { search => { host => 'Zabbix Server' } })->[0];
 
-throws_ok(sub { $zabber->get_items(hostids => [ 1, 2 ],
-                                   host => 'foo',
-                                   key => 'system.uptime') },
-          qr/^Exactly one of 'host' or 'hostids' must be specified as a parameter to get_items/,
-          q{... and specifying both 'host' and 'hostids' ends in error});
+is($host_from_item, $host,
+   '... and the host accessor accesses the correct host');
 
-use Data::Dumper;
+is_deeply($host_from_item, $host,
+          '... or at least they are identical');
 
-my $host_from_item = $zabbix_uptime->get_host;
-my ($host_directly) = grep { $_->{host} eq 'Zabbix Server' } @{$hosts};
+$zabbix_uptime->data->{description} = 'Custom description';
 
-is_deeply($host_from_item,
-          $host_directly,
-          '... and items can query the server for their own host')
-    or diag(Dumper($host_from_item, $host_directly));
+$zabbix_uptime->push;
+
+$zabbix_uptime->pull;
+
+is($zabbix_uptime->data->{description}, 'Custom description',
+   '... and updated data can be pushed back to the server');
+
+$zabbix_uptime->data->{description} = 'Host uptime (in sec)';
+$zabbix_uptime->push;
+
+my $new_item = Zabbix::API::Item->new(root => $zabber,
+                                      data => { key_ => 'system.uptime[minutes]',
+                                                description => 'This item brought to you by Zabbix::API',
+                                                hostid => $zabbix_uptime->host->data->{hostid} });
+
+isa_ok($new_item, 'Zabbix::API::Item',
+       '... and an item created manually');
+
+eval { $new_item->push };
+
+if ($@) { diag "Caught exception: $@" };
+
+ok($new_item->created,
+   '... and pushing it to the server creates a new item');
+
+eval { $new_item->delete };
+
+if ($@) { diag "Caught exception: $@" };
+
+ok(!$new_item->created,
+   '... and calling its delete method removes it from the server');
+
+eval { $zabber->logout };
