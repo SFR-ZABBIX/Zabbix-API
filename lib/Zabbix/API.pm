@@ -141,11 +141,7 @@ sub raw_query {
 
         my $error = $@;
 
-        cluck $error;
-
-        warn "Data was:\n".Dumper(\%args);
-
-        die 'and now we relinquish control';
+        confess $error;
 
     }
 

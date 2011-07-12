@@ -133,9 +133,6 @@ sub push {
         say sprintf('Updating %s (match by collisions)', $self->prefix)
             if $self->{root}->{verbosity};
 
-        use Data::Dumper;
-        print Dumper(\@colliders);
-
         if (@colliders > 1) {
 
             croak sprintf('Cannot push %s: too many possible targets', $self->prefix);

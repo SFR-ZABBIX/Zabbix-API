@@ -123,13 +123,9 @@ sub host {
 
         if (eval { $value->isa('Zabbix::API::Host') }) {
 
-            say 'Pulled!';
-
             $value->pull;
 
         } elsif (defined $type and $type eq 'HASH') {
-
-            say 'Made!';
 
             $value = $self->{root}->fetch('Host', params => { search => { hostid => $value->{hostid} } })->[0];
 
