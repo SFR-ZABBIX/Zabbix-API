@@ -83,8 +83,8 @@ sub collides {
 
     my $self = shift;
 
-    return $self->{root}->query(method => $self->prefix('.exists'),
-                                params => { name => $self->data->{name} });
+    return @{$self->{root}->query(method => $self->prefix('.get'),
+                                  params => { search => { name => $self->data->{name} } })};
 
 }
 
