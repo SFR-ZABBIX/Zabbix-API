@@ -1,8 +1,12 @@
-use Test::More tests => 8;
+use Test::More;
 use Test::Exception;
 
-unless ($ENV{ZABBIX_SERVER}) {
-    
+if ($ENV{ZABBIX_SERVER}) {
+
+    plan tests => 8;
+
+} else {
+
     plan skip_all => 'Needs an URL in $ENV{ZABBIX_SERVER} to run tests.';
 
 }

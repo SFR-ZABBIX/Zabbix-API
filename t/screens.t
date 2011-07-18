@@ -1,10 +1,14 @@
-use Test::More tests => 16;
+use Test::More;
 use Test::Exception;
 
 use Zabbix::API;
 use Zabbix::API::Graph;
 
-unless ($ENV{ZABBIX_SERVER}) {
+if ($ENV{ZABBIX_SERVER}) {
+
+    plan tests => 16;
+
+} else {
 
     plan skip_all => 'Needs an URL in $ENV{ZABBIX_SERVER} to run tests.';
 

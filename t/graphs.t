@@ -1,11 +1,15 @@
-use Test::More tests => 14;
+use Test::More;
 use Test::Exception;
 use Data::Dumper;
 use UNIVERSAL;
 
 use Zabbix::API;
 
-unless ($ENV{ZABBIX_SERVER}) {
+if ($ENV{ZABBIX_SERVER}) {
+
+    plan tests => 14;
+
+} else {
 
     plan skip_all => 'Needs an URL in $ENV{ZABBIX_SERVER} to run tests.';
 
