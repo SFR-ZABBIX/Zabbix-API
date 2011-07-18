@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-  unless ($ENV{AUTHOR_TESTS}) {
+  unless ($ENV{RELEASE_TESTING}) {
     require Test::More;
     Test::More::plan(skip_all => 'these tests are for release candidate testing');
   }
