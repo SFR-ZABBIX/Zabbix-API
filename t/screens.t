@@ -1,4 +1,4 @@
-use Test::More tests => 15;
+use Test::More tests => 16;
 use Test::Exception;
 
 use Zabbix::API;
@@ -81,6 +81,13 @@ lives_ok(sub { $screen->push },
          '... and pushing a screen with a new graph works');
 
 ok($graph->created, '... and the new graph is created on the server');
+
+my $existing = Zabbix::API::Screen->new(root => $zabber,
+                                        data => { name => 'Custom screen' });
+
+$existing->push;
+
+is($existing, $screen, '... and trying to push an existing screen as new merges both objects');
 
 lives_ok(sub { $screen->delete }, '... and deleting a screen works');
 

@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Test::Exception;
 use Data::Dumper;
 
@@ -67,6 +67,13 @@ if ($@) { diag "Caught exception: $@" };
 
 ok($new_host->created,
    '... and pushing it to the server creates a new host');
+
+my $existing = Zabbix::API::Host->new(root => $zabber,
+                                      data => { host => 'Another Server' });
+
+$existing->push;
+
+is($existing, $new_host, '... and trying to push an existing host as new merges both objects');
 
 eval { $new_host->delete };
 
