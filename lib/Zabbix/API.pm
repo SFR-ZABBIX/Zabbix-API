@@ -19,13 +19,15 @@ sub new {
     my $class = shift;
     my %args = validate(@_, { server => 1,
                               verbosity => 0,
-                              env_proxy => 0 });
+                              env_proxy => 0,
+                              lazy => 0 });
 
     my $self = \%args;
 
     # defaults
     $self->{verbosity} = 0 unless exists $self->{verbosity};
     $self->{env_proxy} = 0 unless exists $self->{env_proxy};
+    $self->{lazy} = 0 unless exists $self->{lazy};
 
     $self->{stash} = {};
 
@@ -39,6 +41,25 @@ sub new {
     bless $self, $class;
 
     return $self;
+
+}
+
+sub stash {
+
+    ## mutator for stash
+
+    my ($self, $value) = @_;
+
+    if (defined $value) {
+
+        $self->{stash} = $value;
+        return $self->{stash};
+
+    } else {
+
+        return $self->{stash};
+
+    }
 
 }
 
@@ -414,6 +435,33 @@ proxies.  Setting this attribute after construction does nothing.
 
 =head1 BUGS AND MISSING FEATURES
 
+=head2 THE GREAT RACE CONDITION
+
+Consider the following:
+
+  my $host = $zabbix->fetch('Host', params => ...);
+
+  my $same_host = Zabbix::API::Host->new(root => $zabbix,
+                                         params => same...);
+
+  $same_host->push;
+
+  is_deeply($host, $same_host); # yup
+  isnt($host, $same_host); # also yup
+
+This means you can change the attribute A in C<$host> and push it, and it will
+change on the server; then you can change some other attribute B in
+C<$same_host> and push it, and it will change on the server... and attribute A
+will be changed back to its old value before you changed it in C<$host> since
+C<$host> and C<$same_host> are different references to different objects and
+don't know about each other!  Of course this is also true if someone else is
+fiddling with the hosts directly on the web interface or in any other way.
+
+To work around this, you have to C<pull()> just before you start changing
+things.  Currently C<Zabbix::API> does its best to return existing references
+when you C<fetch()> from the server; ideally C<$host> and C<$same_host> would
+also point to the same object, but they don't.
+
 =head2 MOOSE, ABSENCE OF
 
 The distribution doesn't use Moose, because it was written with light
@@ -429,14 +477,14 @@ which would be easy to allow with Moose traits.  Plus, I had to write
 boilerplate validation code, which would have been taken care of by Moose at
 least where types and type coercions are concerned.
 
-=head2 BUGS THAT ARE NOT RELATED TO THE ABSENCE OF MOOSE
+=head2 OTHER BUGS THAT ARE NOT RELATED TO THE ABSENCE OF MOOSE
 
 It is quite slow.  The server itself does not appear to be lightning fast; at
 least a recent Zabbix (1.8.5) on a Debian squeeze VM takes a couple seconds to
 reply to even trivial JSON-RPC queries.  This is compounded by the fact that
-Zabbix::API is being extra paranoid about default values and tries to C<pull()>
-every time it is relatively safe to do so, for instance immediately after a
-C<push()>.
+Zabbix::API is being extra paranoid about default values and name/id collisions
+and fetches data maybe more often than necessary, for instance immediately
+before and after a C<push()>.
 
 Several types of objects are not implemented in this distribution; feel free to
 contribute them or write your own distribution (see L<Zabbix::API::CRUDE> for

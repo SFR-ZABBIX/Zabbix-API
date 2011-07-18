@@ -74,7 +74,16 @@ sub pull {
                                                  $self->extension
                                              })->[0];
 
-        $self->{root}->reference($self);
+        # uniquify objects
+        if (my $replacement = $self->{root}->refof($self)) {
+
+            $self = $replacement;
+
+        } else {
+
+            $self->{root}->reference($self);
+
+        }
 
     }
 
@@ -85,6 +94,8 @@ sub pull {
 sub created {
 
     my $self = shift;
+
+    return $self->id if $self->{root}->{lazy};
 
     return @{$self->{root}->query(method => $self->prefix('.get'),
                                   params => {
@@ -113,16 +124,10 @@ sub push {
         say sprintf('Updating %s %s', $self->prefix, $self->id)
             if $self->{root}->{verbosity};
 
-        if (ref $self eq 'Zabbix::API::Host') {
-
-            delete $self->data->{host};
-
-        }
-
         $self->{root}->query(method => $self->prefix('.update'),
                              params => $data);
 
-        $self->pull;
+        $self->pull unless $self->{root}->{lazy};
 
     } elsif ($self->id) {
 
@@ -158,7 +163,7 @@ sub push {
 
         $self->id($id);
 
-        $self->pull;
+        $self->pull unless $self->{root}->{lazy};
 
     }
 
