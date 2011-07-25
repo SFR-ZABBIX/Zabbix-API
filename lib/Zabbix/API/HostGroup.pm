@@ -32,11 +32,11 @@ sub prefix {
 
     if ($suffix) {
 
-        return 'group'.$suffix;
+        return 'hostgroup'.$suffix;
 
     } else {
 
-        return 'group';
+        return 'hostgroup';
 
     }
 
