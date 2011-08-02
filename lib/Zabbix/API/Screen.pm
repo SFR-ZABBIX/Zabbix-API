@@ -143,6 +143,19 @@ sub push {
                 croak 'Type mismatch: graph attribute should be an instance of Zabbix::API::Graph';
 
             }
+        } elsif (exists $item->{simplegraph}) {
+
+            if (eval { $item->{simplegraph}->isa('Zabbix::API::Item') }) {
+
+                $item->{simplegraph}->push;
+
+                $item->{resourcetype} = SCREEN_RESOURCE_SIMPLE_GRAPH;
+                $item->{resourceid} = $item->{simplegraph}->id;
+                delete $item->{simplegraph};
+
+            } else {
+                    croak 'Type mismatch: graph attribute should be an instance of Zabbix::API::Item';
+            }
 
         }
 
