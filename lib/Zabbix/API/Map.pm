@@ -90,42 +90,33 @@ __END__
 
 =head1 NAME
 
-Zabbix::API::Item -- Zabbix item objects
+Zabbix::API::Map -- Zabbix map objects
 
 =head1 SYNOPSIS
 
-  use Zabbix::API::Item;
+  use Zabbix::API::Map;
 
   # TODO write the rest
 
 =head1 DESCRIPTION
 
-Handles CRUD for Zabbix graph objects.
+Handles CRUD for Zabbix map objects.
 
-This is a subclass of C<Zabbix::API::CRUDE>.
-
-=head1 METHODS
-
-=over 4
-
-=item collides()
-
-Returns true if the item exists with this key on this hostid, false otherwise.
-
-=item host()
-
-Accessor for a local C<host> attribute, which it also happens to set from the
-server data if it isn't set already.
-
-=back
+This is a very simple subclass of C<Zabbix::API::CRUDE>.  Only the required
+methods are implemented (and in a very simple fashion on top of that).
 
 =head1 EXPORTS
 
-Way too many constants, but for once they're documented (here:
-L<http://www.zabbix.com/documentation/1.8/api/item/constants>).
+The various integers representing map element types are implemented as constants:
 
-Nothing is exported by default; you can use the tags C<:item_types>,
-C<:value_types>, C<:data_types> and C<:status_types> (or import by name).
+  MAP_ELEMENT_TYPE_HOST
+  MAP_ELEMENT_TYPE_MAP
+  MAP_ELEMENT_TYPE_TRIGGER
+  MAP_ELEMENT_TYPE_HOSTGROUP
+  MAP_ELEMENT_TYPE_IMAGE
+
+Nothing is exported by default; you can use the tag C<:map_element_types> (or
+import by name).
 
 =head1 SEE ALSO
 

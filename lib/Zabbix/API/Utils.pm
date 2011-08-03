@@ -90,7 +90,7 @@ represented here (fixme!).
 
 You'll have noticed that this makes use of the excellent "named capture buffers"
 feature, which means you need Perl 5.10 or higher.
-  
+
 =back
 
 =head1 SEE ALSO

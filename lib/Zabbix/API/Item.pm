@@ -200,7 +200,7 @@ Zabbix::API::Item -- Zabbix item objects
 
 =head1 DESCRIPTION
 
-Handles CRUD for Zabbix graph objects.
+Handles CRUD for Zabbix item objects.
 
 This is a subclass of C<Zabbix::API::CRUDE>.
 
