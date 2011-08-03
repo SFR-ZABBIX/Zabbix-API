@@ -5,7 +5,33 @@ use warnings;
 use 5.010;
 use Carp;
 
-use parent qw/Zabbix::API::CRUDE/;
+use parent qw/Exporter Zabbix::API::CRUDE/;
+
+# these do not exist in Zabbix but we make them up for consistency's sake
+use constant {
+    MAP_ELEMENT_TYPE_HOST => 0,
+    MAP_ELEMENT_TYPE_MAP => 1,
+    MAP_ELEMENT_TYPE_TRIGGER => 2,
+    MAP_ELEMENT_TYPE_HOSTGROUP => 3,
+    MAP_ELEMENT_TYPE_IMAGE => 4
+};
+
+our @EXPORT_OK = qw/
+MAP_ELEMENT_TYPE_HOST
+MAP_ELEMENT_TYPE_MAP
+MAP_ELEMENT_TYPE_TRIGGER
+MAP_ELEMENT_TYPE_HOSTGROUP
+MAP_ELEMENT_TYPE_IMAGE/;
+
+our %EXPORT_TAGS = (
+    map_element_types => [
+        qw/MAP_ELEMENT_TYPE_HOST
+        MAP_ELEMENT_TYPE_MAP
+        MAP_ELEMENT_TYPE_TRIGGER
+        MAP_ELEMENT_TYPE_HOSTGROUP
+        MAP_ELEMENT_TYPE_IMAGE/
+    ],
+);
 
 sub id {
 
