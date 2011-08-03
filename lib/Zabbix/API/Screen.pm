@@ -201,8 +201,6 @@ have been specified for all the screenitems and throws an exception otherwise.
 This method handles extraneous C<< graph => Zabbix::API::Graph >> attributes in
 the screenitems array, transforming them into C<resourceid> and C<resourcetype>
 attributes, and pushing the graphs to the server if they don't exist already.
-The original graph attributes are kept but hidden from the C<CRUDE> C<push>
-method, and restored after the C<pull> method is called.
 
 This means you can put C<Zabbix::API::Graph> objects in your data and the module
 will Do The Right Thing (assuming you agree with my definition of the Right
