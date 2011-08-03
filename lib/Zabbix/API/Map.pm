@@ -105,7 +105,8 @@ sub hosts {
             ## keep selements that are not hosts
 
             push @new_selements, ($selement)
-                unless $selement->{elementtype} == MAP_ELEMENT_TYPE_HOST;
+                unless (exists $_->{host}
+                        or $selement->{elementtype} == MAP_ELEMENT_TYPE_HOST);
 
         }
 
@@ -140,7 +141,16 @@ sub push {
                 $item->{host}->push;
 
                 $item->{elementtype} = MAP_ELEMENT_TYPE_HOST;
-                $item->{elementid} = $item->{host}->id;
+                $item->{elementid} = 4;
+                $item->{iconid_on} = 0;
+                $item->{iconid_disabled} = 0;
+                $item->{iconid_maintenance} = 0;
+                $item->{iconid_off} = 100100000000036;
+                $item->{iconid_unknown} = 0;
+                $item->{label_location} = 0;
+                $item->{'x'} = 200;
+                $item->{'y'} = 100;
+                $item->{url} = '';
 
                 # use the hostname as a default
                 $item->{label} //= $item->{host}->data->{host};
@@ -179,8 +189,37 @@ Zabbix::API::Map -- Zabbix map objects
 
 Handles CRUD for Zabbix map objects.
 
-This is a very simple subclass of C<Zabbix::API::CRUDE>.  Only the required
-methods are implemented (and in a very simple fashion on top of that).
+This is a subclass of C<Zabbix::API::CRUDE>.
+
+=head1 METHODS
+
+=over 4
+
+=item hosts([HOSTS])
+
+Specific mutator for the C<selements> array.  Setting the selements through this
+actually only has an effect on host type elements (that is, both elements that
+have the correct C<elementtype> and elements that have a C<host> element).  All
+other types are ignored.
+
+=item push()
+
+This method handles extraneous C<< host => Zabbix::API::Host >> attributes in
+the selements array, transforming them into C<elementid> and C<elementtype>
+attributes (and setting the C<label> attribute to the hostname if it isn't set
+already), and pushing the hosts to the server if they don't exist already.
+
+Overriden from C<Zabbix::API::CRUDE>.
+
+B<** BUG WARNING **> There is a bug in the current Zabbix API implementation
+(the server-side JSON-RPC API is what I mean) that prevents API users from
+creating maps with hosts (possibly any element type).  To work around this, you
+should push the new map without any elements, then set the elements and push the
+map again.  Thus if the map does not exist, this C<push> method stashes the
+elements, pushes the empty map (thereby creating it), unstashes the elements,
+and pushes it again (updating it).
+
+=back
 
 =head1 EXPORTS
 

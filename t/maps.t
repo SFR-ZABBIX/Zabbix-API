@@ -7,7 +7,7 @@ use Zabbix::API;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 14;
+    plan tests => 15;
 
 } else {
 
@@ -45,11 +45,6 @@ my $map = Zabbix::API::Map->new(root => $zabber,
 isa_ok($map, 'Zabbix::API::Map',
        '... and a map created manually');
 
-lives_ok(sub { $map->push }, '... and pushing a new map works')
-    or diag(Dumper($map));
-
-ok($map->created, '... and the pushed map returns true to existence tests (id is '.$map->id.')');
-
 use Zabbix::API::Host;
 $map->hosts([ map { { host => $_ } } @{$zabber->fetch('Host', params => { search => { host => 'Zabbix Server' } })}]);
 
@@ -57,6 +52,12 @@ is(@{$map->hosts}, 1, '... and the map can set its hosts');
 
 is((grep { eval { $_->{host}->isa('Zabbix::API::Host') } or diag($@) } @{$map->hosts}), 1,
    '... and they all are Zabbix::API::Host instances');
+
+lives_ok(sub { $map->push }, '... and pushing a new map works');
+
+ok($map->created, '... and the pushed map returns true to existence tests (id is '.$map->id.')');
+
+is(@{$map->hosts}, 1, '... and the hosts survived');
 
 $map->data->{width} = 1515;
 
