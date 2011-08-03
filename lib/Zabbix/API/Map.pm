@@ -58,6 +58,12 @@ sub prefix {
 
     if ($suffix) {
 
+        if ($suffix =~ m/id(s?)/) {
+
+            return 'sysmap'.$suffix;
+
+        }
+
         return 'map'.$suffix;
 
     } else {
@@ -81,6 +87,77 @@ sub collides {
 
     return @{$self->{root}->query(method => $self->prefix('.get'),
                                   params => { search => { name => $self->data->{name} }})};
+
+}
+
+sub hosts {
+
+    ## mutator for map elements that are hosts
+
+    my ($self, $value) = @_;
+
+    if (defined $value) {
+
+        my @new_selements;
+
+        foreach my $selement (@{$self->data->{selements}}) {
+
+            ## keep selements that are not hosts
+
+            push @new_selements, ($selement)
+                unless $selement->{elementtype} == MAP_ELEMENT_TYPE_HOST;
+
+        }
+
+        ## now add the new selements passed as an arrayref
+
+        push @new_selements, @{$value};
+
+        ## finally clobber the existing selements
+
+        $self->data->{selements} = \@new_selements;
+
+    } else {
+
+        return [ grep { exists $_->{host} or $_->{elementtype} == MAP_ELEMENT_TYPE_HOST } @{$self->data->{selements}} ];
+
+    }
+
+}
+
+sub push {
+
+    # override CRUDE's push()
+
+    my $self = shift;
+
+    foreach my $item (@{$self->data->{selements}}) {
+
+        if (exists $item->{host}) {
+
+            if (eval { $item->{host}->isa('Zabbix::API::Host') }) {
+
+                $item->{host}->push;
+
+                $item->{elementtype} = MAP_ELEMENT_TYPE_HOST;
+                $item->{elementid} = $item->{host}->id;
+
+                # use the hostname as a default
+                $item->{label} //= $item->{host}->data->{host};
+
+                delete $item->{host};
+
+            } else {
+
+                croak 'Type mismatch: host attribute should be an instance of Zabbix::API::Host';
+
+            }
+
+        }
+
+    }
+
+    return $self->SUPER::push;
 
 }
 
