@@ -165,6 +165,13 @@ sub push {
 
     }
 
+    if ($self->collides) {
+
+        $self->delete;
+        delete $self->data->{sysmapid};
+
+    }
+
     return $self->SUPER::push;
 
 }
