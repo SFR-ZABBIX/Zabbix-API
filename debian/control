@@ -10,7 +10,6 @@ Build-Depends-Indep: libjson-perl,
  perl (>= 5.10.1) | libparent-perl
 Maintainer: Marc Dequènes (Duck) <mdequenes@uperto.com>
 Standards-Version: 3.9.1
-Homepage: http://search.cpan.org/dist/Zabbix-API/
 
 Package: libzabbix-api-perl
 Architecture: all
