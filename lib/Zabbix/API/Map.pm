@@ -141,18 +141,16 @@ sub push {
                 $item->{host}->push;
 
                 $item->{elementtype} = MAP_ELEMENT_TYPE_HOST;
-                $item->{elementid} = 4;
-                $item->{iconid_on} = 0;
-                $item->{iconid_disabled} = 0;
-                $item->{iconid_maintenance} = 0;
-                $item->{iconid_off} = 100100000000036;
-                $item->{iconid_unknown} = 0;
-                $item->{label_location} = 0;
-                $item->{'x'} = 200;
-                $item->{'y'} = 100;
-                $item->{url} = '';
+                $item->{elementid} = $item->{host}->id;
 
-                # use the hostname as a default
+                # defaults -- no idea what good values for iconid_* would be
+                $item->{iconid_on} //= 0;
+                $item->{iconid_disabled} //= 0;
+                $item->{iconid_maintenance} //= 0;
+                $item->{iconid_off} //= 100100000000036;
+                $item->{iconid_unknown} //= 0;
+
+                # use the hostname as a default label
                 $item->{label} //= $item->{host}->data->{host};
 
                 delete $item->{host};
