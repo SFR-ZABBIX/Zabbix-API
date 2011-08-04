@@ -216,13 +216,9 @@ already), and pushing the hosts to the server if they don't exist already.
 
 Overriden from C<Zabbix::API::CRUDE>.
 
-B<** BUG WARNING **> There is a bug in the current Zabbix API implementation
-(the server-side JSON-RPC API is what I mean) that prevents API users from
-creating maps with hosts (possibly any element type).  To work around this, you
-should push the new map without any elements, then set the elements and push the
-map again.  Thus if the map does not exist, this C<push> method stashes the
-elements, pushes the empty map (thereby creating it), unstashes the elements,
-and pushes it again (updating it).
+B<** WARNING **> Due to the way maps API calls are implemented in Zabbix,
+updating a map will delete it and create it anew.  The C<sysmapid> B<will>
+change if you push an existing map.
 
 =back
 
