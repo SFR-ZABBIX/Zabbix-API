@@ -54,7 +54,7 @@ sub collides {
     my $self = shift;
 
     return @{$self->{root}->query(method => $self->prefix('.get'),
-                                  params => { search => { host => $self->data->{host} },
+                                  params => { filter => { host => $self->data->{host} },
                                               $self->extension })};
 
 }

@@ -127,7 +127,7 @@ sub host {
 
         } elsif (defined $type and $type eq 'HASH') {
 
-            $value = $self->{root}->fetch('Host', params => { search => { hostid => $value->{hostid} } })->[0];
+            $value = $self->{root}->fetch('Host', params => { filter => { hostid => $value->{hostid} } })->[0];
 
         } else {
 

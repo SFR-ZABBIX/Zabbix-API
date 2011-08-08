@@ -150,7 +150,7 @@ sub collides {
     my $self = shift;
 
     return @{$self->{root}->query(method => $self->prefix('.get'),
-                                  params => { search => { key_ => $self->data->{key_} },
+                                  params => { filter => { key_ => $self->data->{key_} },
                                               hostids => [ $self->host->id ]})};
 
 }
