@@ -234,7 +234,7 @@ sub push {
 
         $self->id($collider->id);
 
-        $self->push;
+        $self->SUPER::push;
 
     } else {
 
