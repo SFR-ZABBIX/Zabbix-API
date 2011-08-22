@@ -30,7 +30,11 @@ sub prefix {
 
     my (undef, $suffix) = @_;
 
-    if ($suffix) {
+    if ($suffix and $suffix =~ m/ids?/) {
+
+        return 'group'.$suffix;
+
+    } elsif ($suffix) {
 
         return 'hostgroup'.$suffix;
 

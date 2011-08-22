@@ -6,7 +6,7 @@ use Zabbix::API;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 4;
+    plan tests => 7;
 
 } else {
 
@@ -30,16 +30,36 @@ if ($@) {
 
 }
 
-my $hosts = $zabber->fetch('HostGroup', params => { search => { name => 'Zabbix servers' } });
+my $hostgroups = $zabber->fetch('HostGroup', params => { search => { name => 'Zabbix servers' } });
 
-is(@{$hosts}, 1, '... and a host group known to exist can be fetched');
+is(@{$hostgroups}, 1, '... and a host group known to exist can be fetched');
 
-my $zabhost = $hosts->[0];
+my $zabhost = $hostgroups->[0];
 
 isa_ok($zabhost, 'Zabbix::API::HostGroup',
        '... and that host group');
 
 ok($zabhost->created,
    '... and it returns true to existence tests');
+
+my $new_hostgroup = Zabbix::API::HostGroup->new(root => $zabber,
+                                                data => { name => 'Another HostGroup' });
+
+isa_ok($new_hostgroup, 'Zabbix::API::HostGroup',
+       '... and a hostgroup created manually');
+
+eval { $new_hostgroup->push };
+
+if ($@) { diag "Caught exception: $@" };
+
+ok($new_hostgroup->created,
+   '... and pushing it to the server creates a new hostgroup');
+
+eval { $new_hostgroup->delete };
+
+if ($@) { diag "Caught exception: $@" };
+
+ok(!$new_hostgroup->created,
+   '... and calling its delete method removes it from the server');
 
 eval { $zabber->logout };
