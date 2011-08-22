@@ -45,7 +45,8 @@ sub prefix {
 sub extension {
 
     return ( output => 'extend',
-             select_macros => 'extend' );
+             select_macros => 'extend',
+             select_groups => 'extend' );
 
 }
 
