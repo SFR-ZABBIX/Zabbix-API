@@ -121,6 +121,8 @@ sub login {
 
     $self->{cookie} = $decoded->{result};
 
+    $self->{user} = $args{user};
+
     return $self;
 
 }
@@ -138,6 +140,8 @@ sub logout {
     }
 
     $self->{cookie} = '';
+
+    delete $self->{user};
 
     return $self;
 
