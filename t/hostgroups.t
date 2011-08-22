@@ -59,7 +59,13 @@ eval { $new_hostgroup->delete };
 
 if ($@) { diag "Caught exception: $@" };
 
-ok(!$new_hostgroup->created,
-   '... and calling its delete method removes it from the server');
+TODO: {
+
+    todo_skip 'Current version of the API does not allow even Super Admins to delete HostGroups', 1;
+
+    ok(!$new_hostgroup->created,
+       '... and calling its delete method removes it from the server');
+
+}
 
 eval { $zabber->logout };
