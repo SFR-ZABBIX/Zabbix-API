@@ -155,6 +155,16 @@ sub collides {
 
 }
 
+sub name {
+
+    my $self = shift;
+
+    return sprintf('%s/%s',
+                   eval { $self->host->name } || '???',
+                   $self->data->{key_} || '???');
+
+}
+
 sub host {
 
     ## accessor for host

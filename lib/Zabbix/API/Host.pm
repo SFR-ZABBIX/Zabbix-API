@@ -59,6 +59,36 @@ sub collides {
 
 }
 
+sub name {
+
+    my $self = shift;
+
+    return $self->data->{host} || '???';
+
+}
+
+sub items {
+
+    ## accessor for items
+
+    my ($self, $value) = @_;
+
+    if (defined $value) {
+
+        die 'Accessor items called as mutator';
+
+    } else {
+
+        my $items = $self->{root}->fetch('Item', params => { hostids => [ $self->data->{hostid} ] });
+
+        $self->{items} = $items;
+
+        return $self->{items};
+
+    }
+
+}
+
 1;
 __END__
 =pod
