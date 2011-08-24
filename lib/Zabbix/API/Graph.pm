@@ -8,6 +8,17 @@ use Carp;
 use parent qw/Zabbix::API::CRUDE/;
 use UNIVERSAL;
 
+sub new { 
+	my ($class, %args) = @_; 
+
+	my $self = $class->SUPER::new(%args);
+
+	$self->data->{gitems} = [] unless defined $self->data->{gitems}; 
+
+	return $self;
+}
+
+
 sub id {
 
     ## mutator for id
