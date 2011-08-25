@@ -35,6 +35,12 @@ sub extension {
 
 }
 
+sub name {
+
+    croak 'Class '.(ref shift).' does not implement required method name()';
+
+}
+
 sub data {
 
     ## accessor for data
@@ -272,6 +278,11 @@ This method must return a list that contains the various parameters necessary to
 fetch more data.  (Returning an empty hash means that in most cases, only the
 IDs will be sent by the server.)  E.g. for hosts, this is C<< return (output =>
 'extend') >>.
+
+=item name() (abstract method)
+
+This method must return a preferably unique human-readable identifier.  For
+instance, hosts return the C<host> attribute.
 
 =item data()
 
