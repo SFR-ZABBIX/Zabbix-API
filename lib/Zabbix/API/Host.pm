@@ -110,8 +110,17 @@ Zabbix::API::Host -- Zabbix host objects
 
 Handles CRUD for Zabbix host objects.
 
-This is a very simple subclass of C<Zabbix::API::CRUDE>.  Only the required
-methods are implemented (and in a very simple fashion on top of that).
+This is a subclass of C<Zabbix::API::CRUDE>.
+
+=head1 METHODS
+
+=over 4
+
+=item items()
+
+Accessor for the host's items.
+
+=back
 
 =head1 SEE ALSO
 

@@ -314,6 +314,15 @@ This class' C<prefix> method is B<not> a class method.  The prefix returned
 depends on the type of macro (global or host) which is a characteristic of an
 instance.
 
+=item host([HOST])
+
+Mutator for the macro's host.  C<HOST> should be a C<Host> instance or a hashref
+with a C<hostid> key.
+
+=item globalp()
+
+Return a true value when the macro is global, a false value otherwise.
+
 =back
 
 =head1 SEE ALSO

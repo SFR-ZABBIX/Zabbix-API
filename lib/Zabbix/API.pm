@@ -334,7 +334,13 @@ Try to log out properly.  Unfortunately, the C<user.logout> method is completely
 undocumented and does not appear to work at the moment (see the bug report here:
 L<https://support.zabbix.com/browse/ZBX-3907>).  Users of this distribution are
 advised not to log out at all.  They will B<not be able to log back in> until the
-server has decided their ban period is over (around 30s).
+server has decided their ban period is over (around 30s).  Furthermore, another
+bug in Zabbix (resolved in 1.8.5) prevents successful logins to reset the failed
+logins counter, which means that after three (possibly non-consecutive) failed
+logins every failed login triggers the ban period.
+
+The test suite logs in and out once per test file.  The logout method does not
+work.  There are more than three test files.  Do the math :(
 
 =item raw_query(method => STR, [params => HASHREF])
 
@@ -402,6 +408,10 @@ Returns the correct reference to an object fetched from the server; in other
 words, looks in the stash for an object that has the same C<id>.  This is used
 in indexing objects, to ensure that the stashed objects are updated instead of
 just creating doubles.
+
+=item stash([STASH])
+
+Mutator for the local stash (a hashref of type => id => object).
 
 =back
 
