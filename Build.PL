@@ -8,6 +8,7 @@ my $builder = Module::Build->new(
     license             => 'perl',
     dist_author         => q{Fabrice Gabolde <fabrice.gabolde@uperto.com>},
     dist_version_from   => 'lib/Zabbix/API.pm',
+    dist_abstract       => 'Access the JSON-RPC API of a Zabbix server',
     build_requires => {
         'Test::More' => 0,
         'Test::Exception' => 0,
@@ -21,7 +22,6 @@ my $builder = Module::Build->new(
         'Params::Validate' => 0
     },
     add_to_cleanup      => [ 'Zabbix::API-*' ],
-    create_makefile_pl => 'traditional',
 );
 
 $builder->create_build_script();
