@@ -48,3 +48,6 @@
 
 # Avoid archives of this distribution
 \bZabbix-API-[\d\.\_]+
+
+# debian-specific files
+\bdebian\b
