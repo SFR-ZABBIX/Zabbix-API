@@ -7,7 +7,7 @@ use Zabbix::API;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 14;
+    plan tests => 15;
 
 } else {
 
@@ -45,10 +45,13 @@ my $graph = Zabbix::API::Graph->new(root => $zabber,
 isa_ok($graph, 'Zabbix::API::Graph',
        '... and a graph created manually');
 
+is(@{$graph->items}, 0, '... and the graph has no items initially');
+
 use Zabbix::API::Item;
-$graph->items([map { { item => $_ } }
-               @{$zabber->fetch('Item', params => { search => { key_ => 'vm.memory' },
-                                                    host => 'Zabbix Server' })}]);
+my @newitems = map { { item => $_ } } @{$zabber->fetch('Item', params => { search => { key_ => 'vm.memory' },
+                                                                           host => 'Zabbix Server' })};
+
+$graph->items(\@newitems);
 
 is(@{$graph->items}, 5, '... and the graph can set its items');
 
