@@ -63,6 +63,26 @@ sub stash {
 
 }
 
+sub verbosity {
+
+    ## mutator for verbosity
+
+    my ($self, $value) = @_;
+
+    if (defined $value) {
+
+        $self->{verbosity} = $value;
+        $self->{ua}->{show_progress} = $value;
+        return $self->{verbosity};
+
+    } else {
+
+        return $self->{verbosity};
+
+    }
+
+}
+
 sub reference {
 
     my ($self, $thing) = @_;
@@ -381,6 +401,30 @@ by specialized subclasses provided in the distribution).  The string
 C<Zabbix::API::> will be prepended if it is missing.
 
 Returns an arrayref of CLASS instances.
+
+=item verbosity([VERBOSITY])
+
+Mutator for the verbosity level.
+
+Implemented verbosities so far are 0, 1 and 2, where:
+
+=over 4
+
+=item 0
+
+does not emit any messages,
+
+=item 1
+
+prints out the C<LWP::UserAgent> progress messages and the responses sent by the
+Zabbix server,
+
+=item 2
+
+prints out the C<LWP::UserAgent> progress messages and dumps to stdout (via
+C<Data::Dumper>) the queries sent to the server and the responses received.
+
+=back
 
 =back
 
