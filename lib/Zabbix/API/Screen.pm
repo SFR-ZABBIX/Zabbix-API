@@ -37,16 +37,17 @@ our %EXPORT_TAGS = (
     resources => [ qw/SCREEN_RESOURCE_GRAPH SCREEN_RESOURCE_SIMPLE_GRAPH SCREEN_RESOURCE_MAP SCREEN_RESOURCE_PLAIN_TEXT SCREEN_RESOURCE_HOSTS_INFO SCREEN_RESOURCE_TRIGGERS_INFO SCREEN_RESOURCE_SERVER_INFO SCREEN_RESOURCE_CLOCK SCREEN_RESOURCE_SCREEN SCREEN_RESOURCE_TRIGGERS_OVERVIEW SCREEN_RESOURCE_DATA_OVERVIEW SCREEN_RESOURCE_URL SCREEN_RESOURCE_ACTIONS SCREEN_RESOURCE_EVENTS SCREEN_RESOURCE_HOSTGROUP_TRIGGERS SCREEN_RESOURCE_SYSTEM_STATUS SCREEN_RESOURCE_HOST_TRIGGERS/ ]
     );
 
-sub new { 
-	my ($class, %args) = @_;
+sub new {
 
-	my $self = $class->SUPER::new(%args);
+    my ($class, %args) = @_;
 
-	$self->data->{screenitems} = [] unless defined $self->data->{screenitems};
+    my $self = $class->SUPER::new(%args);
 
-	return $self;
+    $self->data->{screenitems} = [] unless defined $self->data->{screenitems};
+
+    return $self;
+
 }
-
 
 sub id {
 
@@ -107,18 +108,27 @@ sub items {
 
     if (defined $value) {
 
-        # *some* validation, at least
+        if (@{$value}) {
 
-        croak 'Some screen items did not specify all their coordinates'
-            if grep { not exists $_->{'x'}
-                      or not exists $_->{'y'} } @{$value};
+            # *some* validation, at least
+            croak 'Some screen items did not specify all their coordinates'
+                if grep { not exists $_->{'x'}
+                          or not exists $_->{'y'} } @{$value};
 
-        # compute screen hsize and vsize from the screenitems max coordinates
-        my $hsize = max(map { $_->{'x'} } @{$value})+1;
-        my $vsize = max(map { $_->{'y'} } @{$value})+1;
+            # compute screen hsize and vsize from the screenitems max coordinates
+            my $hsize = max(map { $_->{'x'} } @{$value})+1;
+            my $vsize = max(map { $_->{'y'} } @{$value})+1;
 
-        $self->data->{hsize} = $hsize;
-        $self->data->{vsize} = $vsize;
+            $self->data->{hsize} = $hsize;
+            $self->data->{vsize} = $vsize;
+
+        } else {
+
+            # $value is an empty arrayref
+            $self->data->{hsize} = 0;
+            $self->data->{vsize} = 0;
+
+        }
 
         $self->data->{screenitems} = $value;
         return $self->data->{screenitems};
