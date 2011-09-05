@@ -5,8 +5,10 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name         => 'Zabbix::API',
-    license             => 'perl',
-    dist_author         => q{Fabrice Gabolde <fabrice.gabolde@uperto.com>},
+    license             => 'GPL_3',
+    create_license      => 1,
+    dist_author         => [ q{Fabrice Gabolde <fabrice.gabolde@uperto.com>},
+                             q{Marc Dequenes <marc.dequenes@uperto.com>} ],
     dist_version_from   => 'lib/Zabbix/API.pm',
     dist_abstract       => 'Access the JSON-RPC API of a Zabbix server',
     build_requires => {
@@ -22,6 +24,7 @@ my $builder = Module::Build->new(
         'Params::Validate' => 0
     },
     add_to_cleanup      => [ 'Zabbix::API-*' ],
+    release_status      => 'stable',
 );
 
 $builder->create_build_script();
