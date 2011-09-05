@@ -51,3 +51,6 @@
 
 # debian-specific files
 \bdebian\b
+
+# produced by kwalitee tests
+^Debian_CPANTS.txt
