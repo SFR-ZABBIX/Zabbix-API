@@ -10,11 +10,31 @@ all) types of objects, all in Perl with Perlish constructs.
 Examples are available in the examples/ folder; the tests are also good material
 to start with.
 
-* About us
+* About the authors
 
 This distribution was originally written by Uperto for SFR, a French ISP and
 telecom.
 
+* Installation
+
+This distribution supports installation via Module::Build:
+
+  perl Build.pl [OPTIONS]
+  ./Build
+  ./Build test
+  ./Build install
+
+Check out https://metacpan.org/module/Module::Build for documentation on how to
+use Module::Build installers.
+
+Alternatively, you can trust the various CPAN clients to pull the distribution
+and install it automagically, along with any dependencies you might be missing.
+
 * Bugs and complaints
 
 We have the usual RT queue on rt.cpan.org.
+
+* Contributing
+
+Our repository ought to be found on GitHub by the time the distribution is
+released.
