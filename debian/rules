@@ -2,3 +2,16 @@
 
 %:
 	dh $@
+
+PACKAGE := $(shell dpkg-parsechangelog  | \
+	sed -ne 's/^Source: \([a-z.-]*\).*/\1/p')
+
+SRC_VERSION := $(shell dpkg-parsechangelog | \
+	sed -ne 's/^Version: \([^-]\+\)-.*/\1/p')
+
+# made to work in upstream git workdir, not Debian
+get-orig-source:
+	git archive --format=tar --prefix=$(PACKAGE)/ HEAD | \
+	  gzip --no-name --best >../$(PACKAGE)_$(SRC_VERSION).orig.tar.gz
+
+.PHONY: get-orig-source
