@@ -16,7 +16,7 @@ use constant RE_FORMULA =>
            :
            (?<item>[\w.,_]+)
            (?:\[
-             (?<item_arg>([\w\/]+)(,([\w\/]+))*)
+             (?<item_arg>([\w\/ ]+)(,([\w\/ ]+))*)
            \])?)
            |
            .*?)
