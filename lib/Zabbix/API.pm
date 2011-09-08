@@ -136,7 +136,7 @@ sub login {
     if ($@) {
 
         # probably could not connect at all
-        croak 'Could not connect: '.$response->decoded_content;
+        croak sprintf('Could not connect: %s (%s)', $response->message, $response->code);
 
     }
 
