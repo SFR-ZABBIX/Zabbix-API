@@ -131,7 +131,14 @@ sub login {
 
     $self->{cookie} = '';
 
-    my $decoded = decode_json($response->decoded_content);
+    my $decoded = eval { decode_json($response->decoded_content) };
+
+    if ($@) {
+
+        # probably could not connect at all
+        croak 'Could not connect: '.$response->decoded_content;
+
+    }
 
     if ($decoded->{error}) {
 

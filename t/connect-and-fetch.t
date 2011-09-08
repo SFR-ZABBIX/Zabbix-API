@@ -3,7 +3,7 @@ use Test::Exception;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 8;
+    plan tests => 9;
 
 } else {
 
@@ -48,3 +48,9 @@ TODO: {
        '... and logging out removes the cookie from the object');
 
 }
+
+throws_ok(sub { my $fakezabber = Zabbix::API->new(server => 'http://google.com');
+                $fakezabber->{ua}->timeout(5);
+                $fakezabber->login(user => 'api', password => 'kweh') },
+          qr/^Could not connect/,
+          '... and trying to log to a random URI fails');
