@@ -125,7 +125,15 @@ sub host {
 
         if (eval { $value->isa('Zabbix::API::Host') }) {
 
-            $value->pull;
+            if ($value->created) {
+
+                $value->pull;
+
+            } else {
+
+                $value->push;
+
+            }
 
         } elsif (defined $type and $type eq 'HASH') {
 
@@ -236,7 +244,31 @@ sub push {
 
         $self->id($collider->id);
 
-        $self->SUPER::push;
+        $self->host->push if $self->host;
+
+        if ($self->globalp) {
+
+            $method = '.updateGlobal';
+
+            $parameters = { macro => $self->data->{macro},
+                            value => $self->data->{value} };
+
+        } else {
+
+            $method = '.massUpdate';
+
+            $parameters = { macros => [
+                                { macro => $self->data->{macro},
+                                  value => $self->data->{value} }
+                                ],
+                            hosts => [ { hostid => $self->host->id } ] };
+
+        }
+
+        $self->{root}->query(method => $self->prefix($method),
+                             params => $parameters);
+
+        $self->pull;
 
     } else {
 
