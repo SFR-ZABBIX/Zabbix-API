@@ -63,6 +63,10 @@ sub prefix {
 
             return ($self->globalp?'globalmacro':'hostmacro').$suffix;
 
+        } elsif ($suffix eq '.delete') {
+
+            return 'usermacro.'.($self->globalp?'deleteGlobal':'deleteHostMacro');
+
         }
 
         return 'usermacro'.$suffix;
