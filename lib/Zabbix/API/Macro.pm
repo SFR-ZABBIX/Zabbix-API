@@ -90,8 +90,6 @@ sub collides {
 
     my $self = shift;
 
-    my %additional;
-
     if ($self->globalp) {
 
         return @{$self->{root}->query(method => $self->prefix('.get'),
