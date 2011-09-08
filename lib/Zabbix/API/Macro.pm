@@ -105,6 +105,13 @@ sub collides {
 
 }
 
+sub name {
+
+    my $self = shift;
+    return $self->data->{macro};
+
+}
+
 sub globalp {
 
     my $self = shift;
