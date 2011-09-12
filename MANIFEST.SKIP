@@ -54,3 +54,6 @@
 
 # produced by kwalitee tests
 ^Debian_CPANTS.txt
+
+# smoke tests
+^smoke.tgz
