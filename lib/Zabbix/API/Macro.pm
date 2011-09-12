@@ -7,7 +7,6 @@ use Carp;
 
 use parent qw/Zabbix::API::CRUDE/;
 
-use UNIVERSAL;
 use Scalar::Util qw/reftype/;
 use Zabbix::API::Host;
 

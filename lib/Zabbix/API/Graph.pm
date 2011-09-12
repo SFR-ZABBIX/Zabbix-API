@@ -6,7 +6,6 @@ use 5.010;
 use Carp;
 
 use parent qw/Zabbix::API::CRUDE/;
-use UNIVERSAL;
 
 sub new { 
 	my ($class, %args) = @_; 

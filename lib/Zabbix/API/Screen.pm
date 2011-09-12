@@ -7,7 +7,6 @@ use Carp;
 
 use parent qw/Exporter Zabbix::API::CRUDE/;
 
-use UNIVERSAL;
 use List::Util qw/max/;
 
 # extracted from frontends/php/include/defines.inc.php

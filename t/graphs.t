@@ -1,7 +1,6 @@
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
-use UNIVERSAL;
 
 use Zabbix::API;
 
