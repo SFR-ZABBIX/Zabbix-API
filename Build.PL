@@ -6,7 +6,6 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'Zabbix::API',
     license             => 'GPL_3',
-    create_license      => 1,
     dist_author         => [ q{Fabrice Gabolde <fabrice.gabolde@uperto.com>},
                              q{Marc Dequenes <marc.dequenes@uperto.com>} ],
     dist_version_from   => 'lib/Zabbix/API.pm',
