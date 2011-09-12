@@ -10,6 +10,7 @@ my $builder = Module::Build->new(
                              q{Marc Dequenes <marc.dequenes@uperto.com>} ],
     dist_version_from   => 'lib/Zabbix/API.pm',
     dist_abstract       => 'Access the JSON-RPC API of a Zabbix server',
+    configure_requires => { 'Module::Build' => '0.36_14' },
     build_requires => {
         'Test::More' => 0,
         'Test::Exception' => 0,
