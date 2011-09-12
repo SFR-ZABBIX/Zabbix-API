@@ -24,6 +24,8 @@ my $builder = Module::Build->new(
     },
     add_to_cleanup      => [ 'Zabbix::API-*' ],
     release_status      => 'stable',
+    meta_merge          => { resources =>
+                             { repository => 'git://github.com/SFR-ZABBIX/Zabbix-API.git' } },
 );
 
 $builder->create_build_script();
