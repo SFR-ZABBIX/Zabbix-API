@@ -261,7 +261,12 @@ sub api_version {
 
 sub fetch {
 
-    my ($self, $class, %args) = @_;
+    my $self = shift;
+    my $class = shift;
+
+    my %args = validate(@_,
+                        { params => { type => HASHREF,
+                                      default => {} } });
 
     $class =~ s/^(?:Zabbix::API::)?/Zabbix::API::/;
 
@@ -399,6 +404,9 @@ API method parameters that identify the objects you're trying to fetch, for
 instance:
 
   $zabbix->fetch('Item', params => { search => { key_ => 'system.uptime' } });
+
+The default value of PARAMS is an empty hashref, which should mean "fetch every
+object of type CLASS".
 
 The method delegates a lot of work to the CLASS so that it can be as generic as
 possible.  Any CLASS name in the C<Zabbix::API> namespace is usable as long as
