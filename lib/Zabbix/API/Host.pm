@@ -102,15 +102,17 @@ Zabbix::API::Host -- Zabbix host objects
 
   use Zabbix::API::Host;
 
-  my $host = $zabbix->fetch(...);
+  # fetch a single host by ID
+  my $host = $zabbix->fetch('Host', params => { filter => { hostid => 10105 } });
 
+  # and delete it
   $host->delete;
 
 =head1 DESCRIPTION
 
 Handles CRUD for Zabbix host objects.
 
-This is a subclass of C<Zabbix::API::CRUDE>.
+This is a subclass of C<Zabbix::API::CRUDE>; see there for inherited methods.
 
 =head1 METHODS
 
