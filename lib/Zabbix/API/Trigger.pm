@@ -152,35 +152,47 @@ Zabbix::API::Trigger -- Zabbix trigger objects
 
 =head1 DESCRIPTION
 
-TODO write this
+Handles CRUD for Zabbix trigger objects.
 
-=head1 ATTRIBUTES
-
-=over 4
-
-=item attribute1
-
-TODO write this
-
-=item attribute2
-
-TODO write this
-
-=back
+This is a subclass of C<Zabbix::API::CRUDE>; see there for inherited methods.
 
 =head1 METHODS
 
 =over 4
 
-=item method(args)
+=item collides()
 
-TODO write this
+Returns true if the trigger exists with this description, false otherwise.
+
+=item hosts()
+
+Accessor for a local C<hosts> attribute, which it also sets from the server data
+when necessary (when it is not yet set, which happens when the trigger has just
+been fetched or immediately after a pull or push -- this is because a trigger's
+notion of its host(s) is "whatever is referred to in the trigger expression").
+The value returned is an arrayref of C<Zabbix::API::Host> instances.
+
+=item items()
+
+Same as C<hosts()>, for items.
 
 =back
 
+=head1 BUGS AND LIMITATIONS
+
+The C<expression> data attribute stored in C<Zabbix::API::Trigger> instances is
+actually an expression ID.  This is what the web API returns.  Expressions are
+also not mapped by the web API, so this is all you get (well, you can get the
+list of hosts and items mentioned in the expression).  If you plan on using this
+distribution to manipulate trigger expressions, a workaround is to have the
+trigger just use a calculated item in a very simple expression, since items work
+as expected.
+
+Dependency management is not yet supported, but that's coming soon.
+
 =head1 SEE ALSO
 
-TODO links to other pods and documentation
+L<Zabbix::API::CRUDE>.
 
 =head1 AUTHOR
 
