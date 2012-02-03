@@ -64,7 +64,7 @@ sub name {
 
     my $self = shift;
 
-    return $self->data->{host} || '???';
+    return $self->data->{host} || '';
 
 }
 
@@ -125,6 +125,11 @@ This is a subclass of C<Zabbix::API::CRUDE>; see there for inherited methods.
 =item items()
 
 Accessor for the host's items.
+
+=item name()
+
+Accessor for the host's name (the "host" attribute); returns the empty string if
+no name is set, for instance if the host has not been created on the server yet.
 
 =back
 
