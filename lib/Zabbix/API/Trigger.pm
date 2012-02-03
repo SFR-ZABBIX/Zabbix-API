@@ -246,6 +246,21 @@ The value returned is an arrayref of C<Zabbix::API::Host> instances.
 
 Same as C<hosts()>, for items.
 
+=item dependencies()
+
+Same as C<hosts()>, for dependencies (which are C<Trigger> instances).
+
+=item add_dependency(DEPENDENCY)
+
+Add a dependency to this trigger.  The dependency can be a trigger ID (an
+integer), or a C<Zabbix::API::Trigger> instance.
+
+=item remove_dependency(DEPENDENCY)
+
+Remove a dependency from this trigger.  The dependency can be a trigger ID (an
+integer), or a C<Zabbix::API::Trigger> instance.  Unlike the web API method,
+this method removes a B<single> dependency.
+
 =back
 
 =head1 BUGS AND LIMITATIONS
@@ -258,7 +273,9 @@ distribution to manipulate trigger expressions, a workaround is to have the
 trigger just use a calculated item in a very simple expression, since items work
 as expected.
 
-Dependency management is not yet supported, but that's coming soon.
+Since the web API does not expose a method through which dependencies can be
+removed individually, the C<remove_dependency> method works around this by
+deleting all dependencies then adding back the rest.
 
 =head1 SEE ALSO
 
