@@ -47,7 +47,8 @@ sub extension {
     return ( output => 'extend',
              select_hosts => 'refer',
              select_items => 'refer',
-             select_dependencies => 'extend' );
+             select_functions => 'extend',
+             select_dependencies => 'refer' );
 
 }
 
@@ -96,7 +97,7 @@ sub hosts {
 
 sub items {
 
-    ## accessor for host
+    ## accessor for items
 
     my ($self, $value) = @_;
 
@@ -115,6 +116,75 @@ sub items {
         return $self->{items};
 
     }
+
+}
+
+sub add_dependency {
+
+    my ($self, $dependency) = @_;
+
+    $self->{root}->query(method => $self->prefix('.addDependencies'),
+                         params => [ { triggerid => $self->id,
+                                       dependsOnTriggerid => eval { $dependency->isa('Zabbix::API::Trigger') } ? $dependency->id : $dependency } ]);
+
+    $self->pull;
+
+    return $self;
+
+}
+
+sub dependencies {
+
+    my ($self, $value) = @_;
+
+    if (defined $value) {
+
+        croak 'Accessor dependencies called as mutator';
+
+    } else {
+
+        unless (exists $self->{dependencies}) {
+
+            $self->{dependencies} = $self->{root}->fetch('Trigger', params => { triggerids => [ map { $_->{triggerid} } @{$self->data->{dependencies}} ] });
+
+        }
+
+        return $self->{dependencies};
+
+    }
+
+}
+
+sub remove_dependency {
+
+    my ($self, $dependency) = @_;
+
+    $self->pull;
+
+    my %deps = map { $_->{triggerid} => $_->{triggerid} } @{$self->data->{dependencies}};
+
+    if (eval { $dependency->isa('Zabbix::API::Trigger') }) {
+
+        return $self unless exists $deps{$dependency->id};
+        delete $deps{$dependency->id};
+
+    } else {
+
+        return $self unless exists $deps{$dependency};
+        delete $deps{$dependency};
+
+    }
+
+    $self->{root}->query(method => $self->prefix('.deleteDependencies'),
+                         params => [ { triggerid => $self->id } ]);
+
+    $self->{root}->query(method => $self->prefix('.addDependencies'),
+                         params => [ map { { triggerid => $self->id,
+                                             dependsOnTriggerid => $_ } } keys %deps ]);
+
+    $self->pull;
+
+    return $self;
 
 }
 
