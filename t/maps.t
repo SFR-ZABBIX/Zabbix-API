@@ -4,6 +4,9 @@ use Data::Dumper;
 
 use Zabbix::API;
 
+use lib 't/lib';
+use Zabbix::API::TestUtils;
+
 if ($ENV{ZABBIX_SERVER}) {
 
     plan tests => 15;
@@ -16,18 +19,7 @@ if ($ENV{ZABBIX_SERVER}) {
 
 use_ok('Zabbix::API::Map');
 
-my $zabber = Zabbix::API->new(server => $ENV{ZABBIX_SERVER},
-                              verbosity => $ENV{ZABBIX_VERBOSITY} || 0);
-
-eval { $zabber->login(user => 'api',
-                      password => 'quack') };
-
-if ($@) {
-
-    my $error = $@;
-    BAIL_OUT($error);
-
-}
+my $zabber = Zabbix::API::TestUtils::canonical_login;
 
 ok(my $default = $zabber->fetch('Map', params => { search => { name => 'Local network' } })->[0],
    '... and a map known to exist can be fetched');
