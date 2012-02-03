@@ -101,13 +101,12 @@ Zabbix::API::Host -- Zabbix host objects
 =head1 SYNOPSIS
 
   use Zabbix::API::Host;
-
   # fetch a single host by ID
   my $host = $zabbix->fetch('Host', params => { filter => { hostid => 10105 } })->[0];
-
+  
   # and delete it
   $host->delete;
-
+  
   # fetch an item's host
   my $item = $zabbix->fetch('Item', params => { filter => { itemid => 22379 } })->[0];
   my $host_from_item = $item->host;
