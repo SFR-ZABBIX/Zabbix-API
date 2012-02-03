@@ -68,6 +68,7 @@ is($map->data->{width}, 1515,
 my $new_host = Zabbix::API::Host->new(root => $zabber,
                                       data => { host => 'Another Server',
                                                 ip => '255.255.255.255',
+                                                useip => 1,
                                                 groups => [ { groupid => 4 } ] });
 
 $map->hosts([{ host => $new_host }]);

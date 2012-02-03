@@ -29,7 +29,7 @@ if ($@) {
 
 }
 
-ok(my $default = $zabber->fetch('Macro', params => { search => { name => 'Local network' } })->[0],
+ok(my $default = $zabber->fetch('Macro', params => { search => { name => 'FOO' } })->[0],
    '... and a macro known to exist can be fetched');
 
 isa_ok($default, 'Zabbix::API::Macro',

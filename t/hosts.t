@@ -60,6 +60,7 @@ $zabhost->push;
 my $new_host = Zabbix::API::Host->new(root => $zabber,
                                       data => { host => 'Another Server',
                                                 ip => '255.255.255.255',
+                                                useip => 1,
                                                 groups => [ { groupid => 4 } ] });
 
 isa_ok($new_host, 'Zabbix::API::Host',
