@@ -15,6 +15,9 @@ to start with.
 This distribution was originally written by Uperto for SFR, a French ISP and
 telecom.
 
+Some patches and most code in the Proxy and Template classes were submitted by
+Chris Larsen.
+
 * Installation
 
 This distribution supports installation via Module::Build:
