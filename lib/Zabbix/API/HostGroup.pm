@@ -95,7 +95,7 @@ methods are implemented (and in a very simple fashion on top of that).
 
 =head1 METHODS
 
-=over4
+=over 4
 
 =item name()
 
