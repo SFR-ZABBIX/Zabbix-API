@@ -62,6 +62,14 @@ sub collides {
 
 }
 
+sub name {
+
+    my $self = shift;
+
+    return $self->data->{name} || '';
+
+}
+
 1;
 __END__
 =pod
@@ -84,6 +92,18 @@ Handles CRUD for Zabbix group objects.
 
 This is a very simple subclass of C<Zabbix::API::CRUDE>.  Only the required
 methods are implemented (and in a very simple fashion on top of that).
+
+=head1 METHODS
+
+=over4
+
+=item name()
+
+Accessor for the hostgroup's name (the "name" attribute); returns the empty
+string if no name is set, for instance if the hostgroup has not been created on
+the server yet.
+
+=back
 
 =head1 SEE ALSO
 
