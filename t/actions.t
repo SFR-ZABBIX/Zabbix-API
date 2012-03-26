@@ -40,7 +40,7 @@ ok($action->created,
 
 my $new_trigger = Zabbix::API::Trigger->new(root => $zabber,
                                             data => { description => 'Another Trigger',
-                                                      expression => '{Zabbix server:system.uptime.last(0)}<600', });
+                                                      expression => '{Zabbix Server:system.uptime.last(0)}<600', });
 
 $new_trigger->push;
 
