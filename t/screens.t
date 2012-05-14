@@ -4,6 +4,9 @@ use Test::Exception;
 use Zabbix::API;
 use Zabbix::API::Graph;
 
+use lib 't/lib';
+use Zabbix::API::TestUtils;
+
 if ($ENV{ZABBIX_SERVER}) {
 
     plan tests => 23;
@@ -16,18 +19,7 @@ if ($ENV{ZABBIX_SERVER}) {
 
 use_ok('Zabbix::API::Screen');
 
-my $zabber = Zabbix::API->new(server => $ENV{ZABBIX_SERVER},
-                              verbosity => $ENV{ZABBIX_VERBOSITY} || 0);
-
-eval { $zabber->login(user => 'api',
-                      password => 'quack') };
-
-if ($@) {
-
-    my $error = $@;
-    BAIL_OUT($error);
-
-}
+my $zabber = Zabbix::API::TestUtils::canonical_login;
 
 ok(my $default = $zabber->fetch('Screen', params => { search => { name => 'Zabbix server' } })->[0],
    '... and a screen known to exist can be fetched');

@@ -4,6 +4,9 @@ use Data::Dumper;
 
 use Zabbix::API;
 
+use lib 't/lib';
+use Zabbix::API::TestUtils;
+
 if ($ENV{ZABBIX_SERVER}) {
 
     plan tests => 7;
@@ -16,19 +19,7 @@ if ($ENV{ZABBIX_SERVER}) {
 
 use_ok('Zabbix::API::HostGroup');
 
-my $zabber = Zabbix::API->new(server => $ENV{ZABBIX_SERVER},
-                              verbosity => $ENV{ZABBIX_VERBOSITY} || 0);
-
-eval { $zabber->login(user => 'api',
-                      password => 'quack') };
-
-if ($@) {
-
-    my $error = $@;
-
-    BAIL_OUT($error);
-
-}
+my $zabber = Zabbix::API::TestUtils::canonical_login;
 
 my $hostgroups = $zabber->fetch('HostGroup', params => { search => { name => 'Zabbix servers' } });
 

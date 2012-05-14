@@ -28,7 +28,7 @@ dies_ok(sub { $zabber->query(method => 'item.get',
                                                      key_ => 'system.uptime' } }) },
         '... and querying Zabbix with no auth cookie fails (assuming no API access is given to the public)');
 
-eval { $zabber->login(user => 'api', password => 'quack') };
+eval { $zabber->login(user => 'api_access', password => 'api') };
 
 ok($zabber->cookie,
    '... and authenticating with correct login/pw succeeds');

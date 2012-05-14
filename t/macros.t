@@ -4,6 +4,9 @@ use Data::Dumper;
 
 use Zabbix::API;
 
+use lib 't/lib';
+use Zabbix::API::TestUtils;
+
 if ($ENV{ZABBIX_SERVER}) {
 
     plan tests => 21;
@@ -16,20 +19,9 @@ if ($ENV{ZABBIX_SERVER}) {
 
 use_ok('Zabbix::API::Macro');
 
-my $zabber = Zabbix::API->new(server => $ENV{ZABBIX_SERVER},
-                              verbosity => $ENV{ZABBIX_VERBOSITY} || 0);
+my $zabber = Zabbix::API::TestUtils::canonical_login;
 
-eval { $zabber->login(user => 'api',
-                      password => 'quack') };
-
-if ($@) {
-
-    my $error = $@;
-    BAIL_OUT($error);
-
-}
-
-ok(my $default = $zabber->fetch('Macro', params => { search => { name => 'Local network' } })->[0],
+ok(my $default = $zabber->fetch('Macro', params => { search => { name => 'FOO' } })->[0],
    '... and a macro known to exist can be fetched');
 
 isa_ok($default, 'Zabbix::API::Macro',

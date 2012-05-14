@@ -270,7 +270,9 @@ used (e.g. graph items -- not currently implemented as such -- have a
 C<graphitemid> but are referred to as C<gitems> elsewhere).
 
 This is a class and instance method (and it returns the same thing in both cases
-so far).
+so far).  Warning: do not rely too much on this returning the correct compound
+name for any SUFFIX, as I have implemented only those special cases that were of
+interest for the rest of the distribution.
 
 =item extension() (abstract method)
 

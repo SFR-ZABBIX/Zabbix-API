@@ -17,13 +17,13 @@ my $builder = Module::Build->new(
         'File::Spec' => 0
     },
     requires => {
-        'perl' => 5.010,
+        'perl' => 5.010_001,
         'JSON' => 0,
         'LWP' => 0,
         'Params::Validate' => 0
     },
     add_to_cleanup      => [ 'Zabbix::API-*' ],
-    release_status      => 'stable',
+    release_status      => 'testing',
     meta_merge          => { resources =>
                              { repository => 'git://github.com/SFR-ZABBIX/Zabbix-API.git' } },
 );

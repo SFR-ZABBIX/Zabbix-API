@@ -1,4 +1,4 @@
-package Zabbix::API::Host;
+package Zabbix::API::Template;
 
 use strict;
 use warnings;
@@ -15,12 +15,12 @@ sub id {
 
     if (defined $value) {
 
-        $self->data->{hostid} = $value;
-        return $self->data->{hostid};
+        $self->data->{templateid} = $value;
+        return $self->data->{templateid};
 
     } else {
 
-        return $self->data->{hostid};
+        return $self->data->{templateid};
 
     }
 
@@ -32,11 +32,11 @@ sub prefix {
 
     if ($suffix) {
 
-        return 'host'.$suffix;
+        return 'template'.$suffix;
 
     } else {
 
-        return 'host';
+        return 'template';
 
     }
 
@@ -44,9 +44,7 @@ sub prefix {
 
 sub extension {
 
-    return ( output => 'extend',
-             select_macros => 'extend',
-             select_groups => 'extend' );
+    return ( output => 'extend' );
 
 }
 
@@ -80,7 +78,7 @@ sub items {
 
     } else {
 
-        my $items = $self->{root}->fetch('Item', params => { hostids => [ $self->data->{hostid} ] });
+        my $items = $self->{root}->fetch('Item', params => { templateids => [ $self->data->{templateid} ] });
 
         $self->{items} = $items;
 
@@ -96,24 +94,15 @@ __END__
 
 =head1 NAME
 
-Zabbix::API::Host -- Zabbix host objects
+Zabbix::API::Template -- Zabbix template objects
 
 =head1 SYNOPSIS
 
-  use Zabbix::API::Host;
-  # fetch a single host by ID
-  my $host = $zabbix->fetch('Host', params => { filter => { hostid => 10105 } })->[0];
-  
-  # and delete it
-  $host->delete;
-  
-  # fetch an item's host
-  my $item = $zabbix->fetch('Item', params => { filter => { itemid => 22379 } })->[0];
-  my $host_from_item = $item->host;
+  TODO write this
 
 =head1 DESCRIPTION
 
-Handles CRUD for Zabbix host objects.
+Handles CRUD for Zabbix template objects.
 
 This is a subclass of C<Zabbix::API::CRUDE>; see there for inherited methods.
 
@@ -123,12 +112,13 @@ This is a subclass of C<Zabbix::API::CRUDE>; see there for inherited methods.
 
 =item items()
 
-Accessor for the host's items.
+Accessor for the template's items.
 
 =item name()
 
-Accessor for the host's name (the "host" attribute); returns the empty string if
-no name is set, for instance if the host has not been created on the server yet.
+Accessor for the template's name (the "host" attribute); returns the empty
+string if no name is set, for instance if the template has not been created on
+the server yet.
 
 =back
 
@@ -139,10 +129,11 @@ L<Zabbix::API::CRUDE>.
 =head1 AUTHOR
 
 Fabrice Gabolde <fabrice.gabolde@uperto.com>
+Patches to this file (actually most code) from Chris Larsen <clarsen@llnw.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 SFR
+Copyright (C) 2012 SFR
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GPLv3.
