@@ -204,15 +204,43 @@ Zabbix::API::Item -- Zabbix item objects
 
 =head1 SYNOPSIS
 
-  use Zabbix::API::Item;
+  use Zabbix::API::Item qw/:item_types/;
 
-  # TODO write the rest
+  # fetch a single item...
+  my $item = $zabbix->fetch('Item', params => { filter => { itemid => 22379 } })->[0];
+
+  # manipulate its properties...
+  $item->data->{multiplier} = 3;
+
+  # and update the properties on the server.
+  $item->push;
+
+  # fetch all items from a host
+  my $host = $zabbix->fetch('Host', params => { filter => { hostid => 10105 } })->[0];
+  my $items = $host->items;
+
+  # create a new item
+  my $new_item = Zabbix::API::Item->new(
+      root => $zabbix,
+      data => { type => ITEM_TYPE_SNMPV2C,
+                value_type => ITEM_VALUE_TYPE_UINT64,
+                snmp_oid => ...,
+                snmp_community => ...,
+                # that's right, key_
+                key_ => 'mynewitem',
+                # so far the following is the only way to create a "item belongs
+                # to host" relationship
+                hostid => $host->id,
+      });
+
+  # an itemid will be generated if the item does not already exist
+  $new_item->push;
 
 =head1 DESCRIPTION
 
 Handles CRUD for Zabbix item objects.
 
-This is a subclass of C<Zabbix::API::CRUDE>.
+This is a subclass of C<Zabbix::API::CRUDE>; see there for inherited methods.
 
 =head1 METHODS
 
@@ -225,7 +253,8 @@ Returns true if the item exists with this key on this hostid, false otherwise.
 =item host()
 
 Accessor for a local C<host> attribute, which it also happens to set from the
-server data if it isn't set already.
+server data if it isn't set already.  The host is an instance of
+C<Zabbix::API::Host>.
 
 =back
 
@@ -236,6 +265,12 @@ L<http://www.zabbix.com/documentation/1.8/api/item/constants>).
 
 Nothing is exported by default; you can use the tags C<:item_types>,
 C<:value_types>, C<:data_types> and C<:status_types> (or import by name).
+
+=head1 BUGS AND ODDITIES
+
+This is probably because of the extremely smart way the Zabbix team has set up
+their database schema, but what you'd expect to be C<"key"> in an item's data is
+actually C<"key_">.
 
 =head1 SEE ALSO
 

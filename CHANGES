@@ -1,3 +1,8 @@
+February 23, 2012 - Version 0.004
+  * Trigger support
+  * Action support
+  * Documented Host and Item name() methods
+
 July 11, 2011 - Version 0.003
   * Mostly completed a distribution-wide rewrite
   * Broke backwards compatibility

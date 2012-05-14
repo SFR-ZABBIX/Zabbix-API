@@ -12,7 +12,7 @@ use Scalar::Util qw/weaken/;
 use JSON;
 use LWP::UserAgent;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub new {
 
@@ -261,7 +261,12 @@ sub api_version {
 
 sub fetch {
 
-    my ($self, $class, %args) = @_;
+    my $self = shift;
+    my $class = shift;
+
+    my %args = validate(@_,
+                        { params => { type => HASHREF,
+                                      default => {} } });
 
     $class =~ s/^(?:Zabbix::API::)?/Zabbix::API::/;
 
@@ -331,6 +336,13 @@ This module manages authentication and querying to a Zabbix server via its
 JSON-RPC interface.  (Zabbix v1.8+ is required for API usage; prior versions
 have no JSON-RPC API at all.)
 
+What you need to start out is probably the C<fetch> method in C<Zabbix::API>; be
+sure to check out also what the various C<Zabbix::API::Foo> classes do, as this
+is how you'll be manipulating the objects you have just fetched.
+
+Finally, there are examples in the C<examples/> folder (well, at least one) and
+in the unit tests.
+
 =head1 METHODS
 
 =over 4
@@ -341,6 +353,9 @@ This is the main constructor for the Zabbix::API class.  It creates a
 LWP::UserAgent instance but does B<not> open any connections yet.
 C<env_proxy> is passed to the LWP::UserAgent constructor, so if it is set to a
 true value then the UA should follow C<$http_proxy> and others.
+
+C<server> is misleading, as the URL expected is actually the whole path to the
+JSON-RPC page, which usually is C<http://example.com/zabbix/api_jsonrpc.php>.
 
 Returns an instance of the C<Zabbix::API> class.
 
@@ -399,6 +414,9 @@ API method parameters that identify the objects you're trying to fetch, for
 instance:
 
   $zabbix->fetch('Item', params => { search => { key_ => 'system.uptime' } });
+
+The default value of PARAMS is an empty hashref, which should mean "fetch every
+object of type CLASS".
 
 The method delegates a lot of work to the CLASS so that it can be as generic as
 possible.  Any CLASS name in the C<Zabbix::API> namespace is usable as long as
