@@ -214,7 +214,7 @@ will Do The Right Thing (assuming you agree with my definition of the Right
 Thing).  Items that have been created this way will not be removed from the
 server if they are removed from the graph, however.
 
-Overriden from C<Zabbix::API::CRUDE>.
+Overridden from C<Zabbix::API::CRUDE>.
 
 =back
 
