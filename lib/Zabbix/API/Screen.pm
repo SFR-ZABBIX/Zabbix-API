@@ -231,7 +231,7 @@ Since graphs do the same thing with their C<Item> graphitems, you can create a
 bunch of items, put them in a bunch of graphs, put those in a screen, push the
 screen, sit back and enjoy the fireworks.
 
-Overriden from C<Zabbix::API::CRUDE>.
+Overridden from C<Zabbix::API::CRUDE>.
 
 =back
 

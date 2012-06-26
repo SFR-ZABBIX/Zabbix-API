@@ -214,7 +214,7 @@ the selements array, transforming them into C<elementid> and C<elementtype>
 attributes (and setting the C<label> attribute to the hostname if it isn't set
 already), and pushing the hosts to the server if they don't exist already.
 
-Overriden from C<Zabbix::API::CRUDE>.
+Overridden from C<Zabbix::API::CRUDE>.
 
 B<** WARNING **> Due to the way maps API calls are implemented in Zabbix,
 updating a map will delete it and create it anew.  The C<sysmapid> B<will>
