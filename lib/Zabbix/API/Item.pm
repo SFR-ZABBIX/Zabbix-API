@@ -205,8 +205,8 @@ sub history {
     my $self = shift;
 
     my %extra_parameters = validate_with(params => \@_,
-                                         spec => { time_from => { type => SCALAR },
-                                                   time_till => { type => SCALAR } },
+                                         spec => { time_from => { type => SCALAR, optional => 1 },
+                                                   time_till => { type => SCALAR, optional => 1 } },
                                          allow_extra => 1);
 
     my $history = $self->{root}->query(method => 'history.get',
