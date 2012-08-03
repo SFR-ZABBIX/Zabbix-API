@@ -110,6 +110,42 @@ Zabbix::API::Host -- Zabbix host objects
   # fetch an item's host
   my $item = $zabbix->fetch('Item', params => { filter => { itemid => 22379 } })->[0];
   my $host_from_item = $item->host;
+  
+  # create a new host (local)
+    my $host = Zabbix::API::Host->new(
+        root => $zabbix,
+        data => {
+            'host'  => 'host.domain.tld',
+            'dns'   => 'host.domain.tld',
+            'ip'    => '127.0.0.1',
+            'port'  => 10050,
+            'useip' => 0,
+            'groups'        => [
+                { 'groupid'       => 1, },
+                { 'groupid'       => 2, },
+                { 'groupid'       => 3, },
+                { 'groupid'       => 4, },
+            ],
+            'templates'     => [
+                { 'templateid'    => 1, },
+                { 'templateid'    => 2,},
+                { 'templateid'    => 3, },
+            ],
+            'macros'                => [
+                {
+                    'value'         => '/cgi-bin/index.php?action=monitoring',
+                    'macro'         => '{$PATH}',
+                },
+                {
+                    'value'         => 'zabbix_monitoring',
+                    'macro'         => '{$SEARCH_STRING}',
+                },
+            ],
+            'proxy_hostid'  => 1,
+        },
+    );
+  # save the new host on the server (i.e. 'create' it)
+    $host->push();
 
 =head1 DESCRIPTION
 
@@ -129,6 +165,12 @@ Accessor for the host's items.
 
 Accessor for the host's name (the "host" attribute); returns the empty string if
 no name is set, for instance if the host has not been created on the server yet.
+
+=item collides()
+
+This method returns a list of hosts colliding (i.e. matching) this one. If there
+if more than one colliding host found the implementation can not know
+on which one to perform updates and will bail out.
 
 =back
 
