@@ -329,6 +329,21 @@ Zabbix::API -- Access the JSON-RPC API of a Zabbix server
   if ($@) { die 'could not authenticate' };
 
   my $items = $zabbix->fetch('Item', params => { search => { ... } });
+  
+  # example for using the query method
+    my $result_ref = $zabbix->query(
+        method => 'host.get',
+        params => {
+            filter => {
+                host => 'host.domain.tld',
+            },
+            output => 'extend',
+            select_macros => 'extend',
+            select_groups => 'extend',
+            selectParentTemplates => 'extend',
+        }
+    );
+
 
 =head1 DESCRIPTION
 
